@@ -13,7 +13,7 @@ type Token struct {
 
 // Create a Token util instance.
 //
-// seed(string): seed value.
+// seed {string} - seed value.
 func New(seed string) *Token {
 	return &Token{
 		seed: seed,
@@ -35,15 +35,19 @@ func (t *Token) AddSeed(seed string) *Token {
 	}
 }
 
+func (t *Token) hash() [32]byte {
+	return sha256.Sum256([]byte(t.seed))
+}
+
 // Create token.
 func (t *Token) Create() string {
-	result := sha256.Sum256([]byte(t.seed))
-	return string(result[:])
+	hash := t.hash()
+	return string(hash[:])
 }
 
 // Create token.
 // specify length
 func (t *Token) CreateSpecifyLength(length int) string {
-	token := t.Create()
-	return token[0:length]
+	hash := t.hash()
+	return string(hash[0:length])
 }
