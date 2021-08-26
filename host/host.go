@@ -19,6 +19,7 @@ func CreateSession(ip string) string {
 	hash := token.CreateSpecifyLength(5)
 
 	memory_retention.CreateKey(hash)
+	memory_retention.SetTopic(hash, "")
 
 	return hash
 }
