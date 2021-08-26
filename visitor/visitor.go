@@ -6,20 +6,20 @@ import (
 
 // Get the topic.
 //
-// Arguments:\n
-// token {string} - Session token.
+// Arguments:
+// 	token {string} - Session token.
 //
-// Returns:\n
-// {string} - Topic.
+// Returns:
+// 	{string} - Topic.
 func GetTopic(token string) (string, error) {
 	return memory_retention.GetTopic(token)
 }
 
 // Set ansert.
 //
-// Arguments:\n
-// token {string} - Session token.
-// answer {string} - Answer.
+// Arguments:
+// 	token {string} - Session token.
+// 	answer {string} - Answer.
 func AddAnswer(token string, answer string) error {
 	return memory_retention.AddAnswer(token, answer)
 }
