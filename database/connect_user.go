@@ -26,12 +26,18 @@ func NewDBConnectUsers(tableName string, config Config) (*DBConnectUsers, error)
 	}, nil
 }
 
+// Create table.
+// If the table already exists, it will not be created.
 func (c *DBConnectUsers) CreateTable() error {
 	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL)"
 
 	return c.DB.CreateTable(c.TableName, columns)
 }
 
+// Add the participating users.
+//
+// Arguments:
+//	data {ConnetUser} - user data.
 func (c *DBConnectUsers) AddUser(data ConnectUser) error {
 	sql := "INSERT INTO ? (id , user_id) NOT NULL) VALUES (?, ?)"
 
@@ -42,6 +48,13 @@ func (c *DBConnectUsers) AddUser(data ConnectUser) error {
 	return nil
 }
 
+// Gets the number of users participating in the target id.
+//
+// Arguments:
+//	targetId {string} - Target id.
+//
+// Returns:
+//	{int} - Number of participants.
 func (c *DBConnectUsers) GetUserNumber(targetId string) (int, error) {
 	sql := "SELECT COUNT(id) FROM ? WHERE id = '?'"
 
@@ -57,6 +70,10 @@ func (c *DBConnectUsers) GetUserNumber(targetId string) (int, error) {
 	return 0, fmt.Errorf("the result could not be parsed to empty or int type result: %v", count)
 }
 
+// Delete all target id information.
+//
+// Arguments:
+//	targetId {string} - Target id to delete.
 func (c *DBConnectUsers) Delete(targetId string) error {
 	sql := "DELETE FROM ? WHERE id = '?'"
 
