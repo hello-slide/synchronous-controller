@@ -1,26 +1,26 @@
 package database
 
+import "fmt"
+
 type Config struct {
-	DriveName *DriveName
+	driverName     string
+	dataSourceName string
 }
 
-type DriveName int
+func NewConfig(user string, dbName string, password string) *Config {
+	config := fmt.Sprintf("host=project:region:instance user=%s dbname=%s password=%s sslmode=disable", user, dbName, password)
 
-const (
-	PostogreSQL DriveName = iota
-	MySQL
-	SQLite
-)
+	return &Config{
+		driverName:     "cloudsqlpostgres",
+		dataSourceName: config,
+	}
+}
 
-func (c DriveName) String() string {
-	switch c {
-	case PostogreSQL:
-		return "postgres"
-	case MySQL:
-		return "mysql"
-	case SQLite:
-		return "sqlite3"
-	default:
-		return "unknown"
+func NewLocalConfig(user string, dbName string, password string) *Config {
+	config := fmt.Sprintf("host=localhost user=%s dbname=%s password=%s sslmode=disable", user, dbName, password)
+
+	return &Config{
+		driverName:     "postgres",
+		dataSourceName: config,
 	}
 }
