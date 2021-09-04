@@ -9,6 +9,13 @@ type DatabaseOp struct {
 	Db *sql.DB
 }
 
+// Create DB op.
+//
+// Arguments:
+//	config {Config} - db config.
+//
+// Returns:
+//	{*DatabaseOp} - database op instance.
 func NewDatabase(config Config) (*DatabaseOp, error) {
 	db, err := sql.Open(config.driverName, config.dataSourceName)
 	if err != nil {

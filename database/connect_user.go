@@ -5,8 +5,7 @@ import (
 )
 
 type DBConnectUsers struct {
-	DB        *DatabaseOp
-	TableName string
+	AbstractDBController
 }
 
 type ConnectUser struct {
@@ -14,6 +13,14 @@ type ConnectUser struct {
 	UserId string `db:"user_id"`
 }
 
+// Create instance of user connect db.
+//
+// Arguments:
+//	tableName {string} - table name.
+//	config {Config} - db config.
+//
+// Returns:
+//	{*DBConnectUsers} - user connect db instance.
 func NewDBConnectUsers(tableName string, config Config) (*DBConnectUsers, error) {
 	db, err := NewDatabase(config)
 	if err != nil {
@@ -21,17 +28,11 @@ func NewDBConnectUsers(tableName string, config Config) (*DBConnectUsers, error)
 	}
 
 	return &DBConnectUsers{
-		DB:        db,
-		TableName: tableName,
+		AbstractDBController{
+			DB:        db,
+			TableName: tableName,
+		},
 	}, nil
-}
-
-// Create table.
-// If the table already exists, it will not be created.
-func (c *DBConnectUsers) CreateTable() error {
-	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL)"
-
-	return c.DB.CreateTable(c.TableName, columns)
 }
 
 // Add the participating users.

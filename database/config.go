@@ -7,6 +7,15 @@ type Config struct {
 	dataSourceName string
 }
 
+// Create DB connect config.
+//
+// Arguments:
+//	user {string} - User name.
+//	dbName {string} - database name.
+//	password {string} - password to connect database.
+//
+// Returns:
+//	{*Config} - Database config.
 func NewConfig(user string, dbName string, password string) *Config {
 	config := fmt.Sprintf("host=project:region:instance user=%s dbname=%s password=%s sslmode=disable", user, dbName, password)
 
@@ -16,6 +25,15 @@ func NewConfig(user string, dbName string, password string) *Config {
 	}
 }
 
+// Create DB connect config by local.
+//
+// Arguments:
+//	user {string} - User name.
+//	dbName {string} - database name.
+//	password {string} - password to connect database.
+//
+// Returns:
+//	{*Config} - Database config.
 func NewLocalConfig(user string, dbName string, password string) *Config {
 	config := fmt.Sprintf("host=localhost user=%s dbname=%s password=%s sslmode=disable", user, dbName, password)
 
