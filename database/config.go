@@ -35,7 +35,13 @@ func NewConfig(user string, dbName string, password string) *Config {
 // Returns:
 //	{*Config} - Database config.
 func NewLocalConfig(user string, dbName string, password string) *Config {
-	config := fmt.Sprintf("host=localhost user=%s dbname=%s password=%s sslmode=disable", user, dbName, password)
+	var config string
+
+	if len(password) == 0 {
+		config = fmt.Sprintf("user=%s dbname=%s sslmode=disable", user, dbName)
+	} else {
+		config = fmt.Sprintf("user=%s dbname=%s password=%s sslmode=disable", user, password, dbName)
+	}
 
 	return &Config{
 		driverName:     "postgres",

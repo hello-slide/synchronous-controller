@@ -1,2 +1,4 @@
+github.com/lib/pq v1.10.3 h1:v9QZf2Sn6AmjXtQeFpdoq/eaNtYP6IN+7lcrygsIAtg=
+github.com/lib/pq v1.10.3/go.mod h1:AlVN5x4E4T544tWzH6hKfbfQvm3HdbOxrmggDNAPY9o=
 github.com/yuto51942/memory-retention v1.0.1 h1:qTGlvUAfp30sJ3RJRPwoocvN1taEg3SJvfo0QDHQqz4=
 github.com/yuto51942/memory-retention v1.0.1/go.mod h1:ZUErhqucUTo8fWXOztUDzNG38uYLOoC9Zjwo/lqM8Z4=

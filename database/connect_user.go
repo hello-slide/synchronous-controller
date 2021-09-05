@@ -40,9 +40,9 @@ func NewDBConnectUsers(tableName string, config Config) (*DBConnectUsers, error)
 // Arguments:
 //	data {ConnetUser} - user data.
 func (c *DBConnectUsers) AddUser(data ConnectUser) error {
-	sql := "INSERT INTO ? (id , user_id) NOT NULL) VALUES (?, ?)"
+	sql := fmt.Sprintf("INSERT INTO %s (id , user_id) VALUES ($1, $2)", c.TableName)
 
-	_, err := c.DB.Execute(sql, c.TableName, data.Id, data.UserId)
+	_, err := c.DB.Execute(sql, data.Id, data.UserId)
 	if err != nil {
 		return err
 	}
@@ -57,18 +57,9 @@ func (c *DBConnectUsers) AddUser(data ConnectUser) error {
 // Returns:
 //	{int} - Number of participants.
 func (c *DBConnectUsers) GetUserNumber(targetId string) (int, error) {
-	sql := "SELECT COUNT(id) FROM ? WHERE id = '?'"
+	sql := fmt.Sprintf("SELECT COUNT(id) FROM %s WHERE id = $1", c.TableName)
 
-	var count interface{}
-
-	if err := c.DB.QueryOneRecord(&count, sql, c.TableName, targetId); err != nil {
-		return 0, err
-	}
-
-	if result, ok := count.(int); ok {
-		return result, nil
-	}
-	return 0, fmt.Errorf("the result could not be parsed to empty or int type result: %v", count)
+	return c.DB.Count(sql, targetId)
 }
 
 // Delete all target id information.
@@ -76,9 +67,9 @@ func (c *DBConnectUsers) GetUserNumber(targetId string) (int, error) {
 // Arguments:
 //	targetId {string} - Target id to delete.
 func (c *DBConnectUsers) Delete(targetId string) error {
-	sql := "DELETE FROM ? WHERE id = '?'"
+	sql := fmt.Sprintf("DELETE FROM %s WHERE id = $1", c.TableName)
 
-	_, err := c.DB.Execute(sql, c.TableName, targetId)
+	_, err := c.DB.Execute(sql, targetId)
 	if err != nil {
 		return err
 	}

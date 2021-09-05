@@ -1,5 +1,7 @@
 package database
 
+import "fmt"
+
 type AbstractDBController struct {
 	DB        *DatabaseOp
 	TableName string
@@ -15,7 +17,7 @@ func (c *AbstractDBController) CreateTable() error {
 
 // Clear all data in table.
 func (c *AbstractDBController) ClearDB() error {
-	sql := "DELETE FROM ?"
+	sql := fmt.Sprintf("DELETE FROM %s", c.TableName)
 
 	_, err := c.DB.Execute(sql, c.TableName)
 	if err != nil {

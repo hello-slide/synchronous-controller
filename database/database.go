@@ -3,6 +3,8 @@ package database
 import (
 	"database/sql"
 	"fmt"
+
+	_ "github.com/lib/pq"
 )
 
 type DatabaseOp struct {
@@ -39,14 +41,20 @@ func (c *DatabaseOp) Query(sql string, args ...interface{}) (*sql.Rows, error) {
 	return c.Db.Query(sql, args...)
 }
 
-// SQL Query Row.
+// Count query.
 //
 // Arguments:
-//	dest {*interface{}} - dest value.
 //	sql {string} - text for sql.
 //	args {...interface{}} - args
-func (c *DatabaseOp) QueryOneRecord(dest *interface{}, sql string, args ...interface{}) error {
-	return c.Db.QueryRow(sql, args...).Scan(&dest)
+//
+// Returns:
+//	{int} - count value.
+func (c *DatabaseOp) Count(sql string, args ...interface{}) (int, error) {
+	var count int
+	if err := c.Db.QueryRow(sql, args...).Scan(&count); err != nil {
+		return 0, err
+	}
+	return count, nil
 }
 
 // SQL Execute. example: create, insert, update, delete ...
@@ -69,9 +77,9 @@ func (c *DatabaseOp) Execute(sql string, args ...interface{}) (sql.Result, error
 //	tableName {string} - table name.
 //	columns {string} - columns.
 func (c *DatabaseOp) CreateTable(tableName string, columns string) error {
-	sql := fmt.Sprintf("CREATE TABLE IF NOT EXISTS ? %s", columns)
+	sql := fmt.Sprintf("CREATE TABLE IF NOT EXISTS %s %s", tableName, columns)
 
-	_, err := c.Execute(sql, tableName)
+	_, err := c.Execute(sql)
 	if err != nil {
 		return err
 	}
