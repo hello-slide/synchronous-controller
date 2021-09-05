@@ -1,5 +1,7 @@
 package database
 
+import "fmt"
+
 type Answer struct {
 	Id     string `db:"id"`
 	UserId string `db:"user_id"`
@@ -23,11 +25,13 @@ func NewDBAnswers(tableName string, config *Config) (*DBAnswers, error) {
 	if err != nil {
 		return nil, err
 	}
+	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL, answer VARCHAR(1024))"
 
 	return &DBAnswers{
 		AbstractDBController{
 			DB:        db,
 			TableName: tableName,
+			Columns:   columns,
 		},
 	}, nil
 }
@@ -37,9 +41,9 @@ func NewDBAnswers(tableName string, config *Config) (*DBAnswers, error) {
 // Arguments:
 // data {*Answer} - Answer data.
 func (c *DBAnswers) AddAnswer(data *Answer) error {
-	sql := "INSERT INTO ? (id , user_id, answer) NOT NULL) VALUES (?, ?, ?)"
+	sql := fmt.Sprintf("INSERT INTO %s (id , user_id, answer) VALUES ($1, $2, $3)", c.TableName)
 
-	_, err := c.DB.Execute(sql, c.TableName, data.Id, data.UserId, data.Answer)
+	_, err := c.DB.Execute(sql, data.Id, data.UserId, data.Answer)
 	if err != nil {
 		return err
 	}
@@ -54,8 +58,8 @@ func (c *DBAnswers) AddAnswer(data *Answer) error {
 // Returns:
 //	{[]Answer} - all answers.
 func (c *DBAnswers) GetAnswers(targetId string) ([]Answer, error) {
-	sql := "SELECT * FROM ? WHERE id = ?"
-	result, err := c.DB.Query(sql, c.TableName, targetId)
+	sql := fmt.Sprintf("SELECT * FROM %s WHERE id = $1", c.TableName)
+	result, err := c.DB.Query(sql, targetId)
 	if err != nil {
 		return nil, err
 	}
@@ -82,9 +86,9 @@ func (c *DBAnswers) GetAnswers(targetId string) ([]Answer, error) {
 // Arguments:
 //	targetId {string} - Target id to delete.
 func (c *DBAnswers) Delete(targetId string) error {
-	sql := "DELETE FROM ? WHERE id = '?'"
+	sql := fmt.Sprintf("DELETE FROM %s WHERE id = $1", c.TableName)
 
-	_, err := c.DB.Execute(sql, c.TableName, targetId)
+	_, err := c.DB.Execute(sql, targetId)
 	if err != nil {
 		return err
 	}

@@ -5,14 +5,13 @@ import "fmt"
 type AbstractDBController struct {
 	DB        *DatabaseOp
 	TableName string
+	Columns   string
 }
 
 // Create table.
 // If the table already exists, it will not be created.
 func (c *AbstractDBController) CreateTable() error {
-	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL)"
-
-	return c.DB.CreateTable(c.TableName, columns)
+	return c.DB.CreateTable(c.TableName, c.Columns)
 }
 
 // Clear all data in table.

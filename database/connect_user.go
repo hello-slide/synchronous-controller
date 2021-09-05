@@ -26,11 +26,13 @@ func NewDBConnectUsers(tableName string, config *Config) (*DBConnectUsers, error
 	if err != nil {
 		return nil, err
 	}
+	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL)"
 
 	return &DBConnectUsers{
 		AbstractDBController{
 			DB:        db,
 			TableName: tableName,
+			Columns:   columns,
 		},
 	}, nil
 }
