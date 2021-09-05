@@ -18,6 +18,11 @@ func CreateClient(ctx context.Context) (*pubsub.Client, error) {
 	return pubsub.NewClient(ctx, projectId, option.WithCredentialsJSON(key))
 }
 
+// Create pubsub used by local.
+func CreateClientLocal(ctx context.Context, projectId string, keyPath string) (*pubsub.Client, error) {
+	return pubsub.NewClient(ctx, projectId, option.WithCredentialsFile(keyPath))
+}
+
 type PubSubController struct {
 	ctx    context.Context
 	client *pubsub.Client

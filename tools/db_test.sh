@@ -5,7 +5,7 @@ if [ $# != 1 ]; then
     exit 1
 fi
 
-export LOCAL_TEST="true"
+export LOCAL_TEST="db"
 export DB_USER=$1
 
 go test -v ./...

@@ -8,7 +8,7 @@ import (
 )
 
 func TestConnectUser(t *testing.T) {
-	if len(os.Getenv("LOCAL_TEST")) == 0 {
+	if os.Getenv("LOCAL_TEST") != "db" {
 		return
 	}
 
@@ -70,7 +70,7 @@ func TestConnectUser(t *testing.T) {
 }
 
 func TestAnswers(t *testing.T) {
-	if len(os.Getenv("LOCAL_TEST")) == 0 {
+	if os.Getenv("LOCAL_TEST") != "db" {
 		return
 	}
 
