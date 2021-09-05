@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"os"
-	"time"
 
 	"cloud.google.com/go/pubsub"
 	"google.golang.org/api/option"
@@ -114,7 +113,7 @@ func (c *PubSubController) StopTopic() error {
 //	message {[]byte} - send message.
 //
 // Returns:
-// {string} - message id.
+//	{string} - message id.
 func (c *PubSubController) Publish(message []byte) (string, error) {
 	if err := c.checkTopic(); err != nil {
 		return "", err
@@ -130,7 +129,7 @@ func (c *PubSubController) Publish(message []byte) (string, error) {
 // check if exist topics.
 //
 // Returns:
-// {bool} - exist if true, false is not.
+//	{bool} - exist if true, false is not.
 func (c *PubSubController) ExistTopic() (bool, error) {
 	if err := c.checkTopic(); err != nil {
 		return false, err
@@ -139,27 +138,51 @@ func (c *PubSubController) ExistTopic() (bool, error) {
 	return c.topic.Exists(c.ctx)
 }
 
-// Subscription topic.
-// Execution will be blocked until you get a new topic or the time limit is reached.
+// Create a new subscription and subscribe.
 //
 // Arguments:
-// extension {time.Duration} - Time limit
+//	id {string} - subscription id.
+//	extension {time.Duration} - Time limit
 //
 // Returns:
-// {string} - received message.
-func (c *PubSubController) Subscription(extension time.Duration) (string, error) {
+//	{string} - received message.
+func (c *PubSubController) CreateSubscription(id string) (string, error) {
 	if err := c.checkTopic(); err != nil {
 		return "", err
 	}
 
-	id := c.topic.ID()
-	sub := c.client.Subscription(id)
-	message := make(chan string)
+	sub, err := c.client.CreateSubscription(c.ctx, id, pubsub.SubscriptionConfig{
+		Topic: c.topic,
+	})
+	if err != nil {
+		return "", err
+	}
 
-	sub.ReceiveSettings.MaxExtension = extension
+	return c.revive(sub)
+}
+
+// Subscription by already exist sub id.
+// Execution will be blocked until you get a new topic or the time limit is reached.
+//
+// Arguments:
+//	id {string} - subscription id.
+//	extension {time.Duration} - Time limit
+//
+// Returns:
+//	{string} - received message.
+func (c *PubSubController) Subscription(id string) (string, error) {
+	sub := c.client.Subscription(id)
+
+	return c.revive(sub)
+}
+
+func (c *PubSubController) revive(sub *pubsub.Subscription) (string, error) {
+	var message string
+
+	sub.ReceiveSettings.Synchronous = true
 
 	err := sub.Receive(c.ctx, func(ctx context.Context, m *pubsub.Message) {
-		message <- string(m.Data)
+		message = string(m.Data)
 		m.Ack()
 	})
 
@@ -167,8 +190,5 @@ func (c *PubSubController) Subscription(extension time.Duration) (string, error)
 		return "", err
 	}
 
-	m := <-message
-	close(message)
-
-	return m, err
+	return message, err
 }

@@ -2,10 +2,12 @@ package pubsub_test
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"testing"
 	"time"
 
+	_pubsub "cloud.google.com/go/pubsub"
 	"github.com/hello-slide/synchronous-controller/pubsub"
 )
 
@@ -19,27 +21,27 @@ func TestPubSub(t *testing.T) {
 	keyPath := os.Getenv("IAM_PATH")
 	projectId := "helloslide"
 	topicName := "test"
+	subId := "subb"
 
 	client, err := pubsub.CreateClientLocal(ctx, projectId, keyPath)
 	if err != nil {
 		t.Fatalf("create client error: %v", err)
 	}
 
-	for _, message := range []string{"hogehoge", "hooaaaa"} {
-		// publish
-		pubsubOp, err := pubsub.NewPubSub(ctx, client).CreateTopic(topicName)
-		if err != nil {
-			t.Fatalf("create topic error: %v", err)
-		}
+	pubsubOpPublish := pubsub.NewPubSub(ctx, client)
+	pubsubOpPublish, err = pubsubOpPublish.CreateTopic(topicName)
+	if err != nil {
+		t.Fatalf("create topic error: %v", err)
+	}
 
-		id, err := pubsubOp.Publish([]byte(message))
-		if err != nil {
-			t.Fatalf("publish error: %v", err)
-		}
-		t.Logf("success publish! id: %v", id)
+	time.Sleep(1 * time.Minute)
+
+	for index, message := range []string{"hogehoge", "hugahuga"} {
+		done := make(chan bool)
+		go publish(client, t, topicName, message, done)
 
 		// subscription
-		pubsubOp, err = pubsub.NewPubSub(ctx, client).SetTopic(topicName)
+		pubsubOp, err := pubsub.NewPubSub(ctx, client).SetTopic(topicName)
 		if err != nil {
 			t.Fatalf("create topic error: %v", err)
 		}
@@ -52,8 +54,16 @@ func TestPubSub(t *testing.T) {
 			t.Fatal("topic dose not exists.")
 		}
 
-		extension := 30 * time.Second
-		resMessage, err := pubsubOp.Subscription(extension)
+		var resMessage string
+
+		if index == 0 {
+			resMessage, err = pubsubOp.CreateSubscription(subId)
+		} else {
+			resMessage, err = pubsubOp.Subscription(subId)
+		}
+
+		<-done
+
 		if err != nil {
 			t.Fatalf("subscription error: %v", err)
 		}
@@ -62,4 +72,26 @@ func TestPubSub(t *testing.T) {
 			t.Fatalf("It is different from the published message.")
 		}
 	}
+}
+
+func publish(client *_pubsub.Client, t *testing.T, topicName string, message string, done chan bool) {
+	time.Sleep(10 * time.Second)
+	fmt.Println("publish!")
+
+	ctx := context.Background()
+
+	pubsubOpPublish := pubsub.NewPubSub(ctx, client)
+
+	var err error
+	pubsubOpPublish, err = pubsubOpPublish.SetTopic(topicName)
+	if err != nil {
+		t.Fatalf("create topic error: %v", err)
+	}
+
+	id, err := pubsubOpPublish.Publish([]byte(message))
+	if err != nil {
+		t.Fatalf("publish error: %v", err)
+	}
+	t.Logf("success publish! id: %v", id)
+	done <- true
 }
