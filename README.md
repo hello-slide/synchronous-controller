@@ -2,6 +2,17 @@
 
 リアルタイムなスライドを実現するためのめちゃくちゃすごい（自分調べ）Dapr appです。
 
+## Env
+
+```env
+KEY= # Google IAM json
+PUBSUB_PROJECT_ID=
+
+DB_USER=
+DB_NAME=
+DB_PASSWORD=
+```
+
 ## Tests
 
 - 必要なもの
