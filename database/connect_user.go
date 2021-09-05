@@ -21,7 +21,7 @@ type ConnectUser struct {
 //
 // Returns:
 //	{*DBConnectUsers} - user connect db instance.
-func NewDBConnectUsers(tableName string, config Config) (*DBConnectUsers, error) {
+func NewDBConnectUsers(tableName string, config *Config) (*DBConnectUsers, error) {
 	db, err := NewDatabase(config)
 	if err != nil {
 		return nil, err
@@ -39,7 +39,7 @@ func NewDBConnectUsers(tableName string, config Config) (*DBConnectUsers, error)
 //
 // Arguments:
 //	data {ConnetUser} - user data.
-func (c *DBConnectUsers) AddUser(data ConnectUser) error {
+func (c *DBConnectUsers) AddUser(data *ConnectUser) error {
 	sql := fmt.Sprintf("INSERT INTO %s (id , user_id) VALUES ($1, $2)", c.TableName)
 
 	_, err := c.DB.Execute(sql, data.Id, data.UserId)

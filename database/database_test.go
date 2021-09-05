@@ -38,7 +38,7 @@ func TestConnectUser(t *testing.T) {
 
 	config := database.NewLocalConfig(user, dbName, password)
 
-	connectUser, err := database.NewDBConnectUsers(tableName, *config)
+	connectUser, err := database.NewDBConnectUsers(tableName, config)
 	if err != nil {
 		t.Fatalf("db connect error: %v", err)
 	}
@@ -48,10 +48,10 @@ func TestConnectUser(t *testing.T) {
 	}
 
 	// Add users.
-	if err := connectUser.AddUser(*sampleDataOne); err != nil {
+	if err := connectUser.AddUser(sampleDataOne); err != nil {
 		t.Fatalf("add user error: %v", err)
 	}
-	if err := connectUser.AddUser(*sampleDataTwo); err != nil {
+	if err := connectUser.AddUser(sampleDataTwo); err != nil {
 		t.Fatalf("add user second error: %v", err)
 	}
 

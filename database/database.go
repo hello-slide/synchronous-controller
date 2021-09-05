@@ -18,7 +18,7 @@ type DatabaseOp struct {
 //
 // Returns:
 //	{*DatabaseOp} - database op instance.
-func NewDatabase(config Config) (*DatabaseOp, error) {
+func NewDatabase(config *Config) (*DatabaseOp, error) {
 	db, err := sql.Open(config.driverName, config.dataSourceName)
 	if err != nil {
 		return nil, err

@@ -18,7 +18,7 @@ type DBAnswers struct {
 //
 // Returns:
 //	{*DBConnectUsers} - user connect db instance.
-func NewDBAnswers(tableName string, config Config) (*DBAnswers, error) {
+func NewDBAnswers(tableName string, config *Config) (*DBAnswers, error) {
 	db, err := NewDatabase(config)
 	if err != nil {
 		return nil, err
@@ -36,7 +36,7 @@ func NewDBAnswers(tableName string, config Config) (*DBAnswers, error) {
 //
 // Arguments:
 // data {*Answer} - Answer data.
-func (c *DBAnswers) AddAnswer(data Answer) error {
+func (c *DBAnswers) AddAnswer(data *Answer) error {
 	sql := "INSERT INTO ? (id , user_id, answer) NOT NULL) VALUES (?, ?, ?)"
 
 	_, err := c.DB.Execute(sql, c.TableName, data.Id, data.UserId, data.Answer)
