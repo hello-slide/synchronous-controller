@@ -77,3 +77,17 @@ func (c *DBConnectUsers) Delete(targetId string) error {
 	}
 	return nil
 }
+
+// Delete user_id information.
+//
+// Arguments:
+//	userId {string} - user id to delete.
+func (c *DBConnectUsers) DeleteUser(userId string) error {
+	sql := fmt.Sprintf("DELETE FROM %s WHERE user_id = $1", c.TableName)
+
+	_, err := c.DB.Execute(sql, userId)
+	if err != nil {
+		return err
+	}
+	return nil
+}
