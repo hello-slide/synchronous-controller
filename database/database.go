@@ -57,6 +57,38 @@ func (c *DatabaseOp) Count(sql string, args ...interface{}) (int, error) {
 	return count, nil
 }
 
+// Get one text.
+//
+// Arguments:
+//	sql {string} - text for sql.
+//	args {...interface{}} - args
+//
+// Returns:
+//	{string} - texts.
+func (c *DatabaseOp) GetText(sql string, args ...interface{}) (string, error) {
+	var text string
+	if err := c.Db.QueryRow(sql, args...).Scan(&text); err != nil {
+		return "", err
+	}
+	return text, nil
+}
+
+// Get bool type.
+//
+// Arguments:
+//	sql {string} - text for sql.
+//	args {...interface{}} - args
+//
+// Returns:
+//	{bool} - result.
+func (c *DatabaseOp) GetBool(sql string, args ...interface{}) (bool, error) {
+	var flag bool
+	if err := c.Db.QueryRow(sql, args...).Scan(&flag); err != nil {
+		return false, err
+	}
+	return flag, nil
+}
+
 // SQL Execute. example: create, insert, update, delete ...
 //
 // Arguments:

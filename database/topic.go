@@ -74,24 +74,7 @@ func (c *DBTopic) UpdateTopic(topic *Topic) error {
 func (c *DBTopic) GetTopic(id string) (string, error) {
 	sql := fmt.Sprintf("SELECT topic FROM %s WHERE id = $1", c.TableName)
 
-	result, err := c.DB.Query(sql, id)
-	if err != nil {
-		return "", err
-	}
-
-	result.Next()
-	var topic string
-
-	if err := result.Scan(&topic); err != nil {
-		return "", err
-	}
-	if err := result.Err(); err != nil {
-		return "", err
-	}
-	result.Close()
-
-	return topic, nil
-
+	return c.DB.GetText(sql, id)
 }
 
 // Get update flag.
@@ -104,20 +87,19 @@ func (c *DBTopic) GetTopic(id string) (string, error) {
 func (c *DBTopic) GetIsUpdate(id string) (bool, error) {
 	sql := fmt.Sprintf("SELECT is_update FROM %s WHERE id = $1", c.TableName)
 
-	result, err := c.DB.Query(sql, id)
+	return c.DB.GetBool(sql, id)
+}
+
+// Delete topic information.
+//
+// Arguments:
+//	id {string} - topic id.
+func (c *DBTopic) Delete(id string) error {
+	sql := fmt.Sprintf("DELETE FROM %s WHERE id = $1", c.TableName)
+
+	_, err := c.DB.Execute(sql, id)
 	if err != nil {
-		return false, err
+		return err
 	}
-
-	result.Next()
-	var isUpdate bool
-
-	if err := result.Scan(&isUpdate); err != nil {
-		return false, err
-	}
-	if err := result.Err(); err != nil {
-		return false, err
-	}
-
-	return isUpdate, nil
+	return nil
 }

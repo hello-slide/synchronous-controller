@@ -209,4 +209,13 @@ func TestTopic(t *testing.T) {
 	if result != "huga" {
 		t.Fatalf("the result is different. value: %v", result)
 	}
+
+	if err := dbTopic.Delete(rootId); err != nil {
+		t.Fatalf("delete error: %v", err)
+	}
+
+	_, err = dbTopic.GetIsUpdate(rootId)
+	if err == nil {
+		t.Fatal("The topic id has been removed and should be an error.")
+	}
 }
