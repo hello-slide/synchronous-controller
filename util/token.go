@@ -49,5 +49,5 @@ func (t *Token) Create() string {
 // specify length
 func (t *Token) CreateSpecifyLength(length int) string {
 	hash := t.hash()
-	return string(hash[0:length])
+	return string(hash[:])[0:length]
 }
