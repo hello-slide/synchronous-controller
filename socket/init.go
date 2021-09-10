@@ -24,10 +24,11 @@ const (
 //	we {*websocket.Conn} - websocket conn.
 //	status {Status} - Type to initialize. host or visitor.
 //	db {*database.DatabaseOp} - database op instance.
+//	userId {string} - user id. use only visitor.
 //
 // Returns:
 //	{string} - unique id.
-func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, error) {
+func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp, userId string) (string, error) {
 	var responseMessage map[string]string
 	if err := websocket.JSON.Receive(ws, &responseMessage); err != nil {
 		return "", err
@@ -37,6 +38,8 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, e
 	if !ok {
 		return "", errors.New("you need to specify the type")
 	}
+
+	connectUser := database.NewDBConnectUsers(ConnectUsersTablename, db)
 
 	if responseType == "0" && status == Host {
 		// host
@@ -52,7 +55,6 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, e
 		if err := answers.CreateTable(); err != nil {
 			return "", nil
 		}
-		connectUser := database.NewDBConnectUsers(ConnectUsersTablename, db)
 		if err := connectUser.CreateTable(); err != nil {
 			return "", nil
 		}
@@ -86,6 +88,13 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, e
 		id, ok := responseMessage["id"]
 		if !ok {
 			return "", errors.New("id is not found")
+		}
+
+		if err := connectUser.AddUser(&database.ConnectUser{
+			Id:     id,
+			UserId: userId,
+		}); err != nil {
+			return "", err
 		}
 
 		// visitor

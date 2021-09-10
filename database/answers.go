@@ -3,10 +3,10 @@ package database
 import "fmt"
 
 type Answer struct {
-	Id     string `db:"id"`
-	UserId string `db:"user_id"`
-	Name   string `db:"name"`
-	Answer string `db:"answer"`
+	Id     string `db:"id" json:"id"`
+	UserId string `db:"user_id" json:"user_id"`
+	Name   string `db:"name" json:"name"`
+	Answer string `db:"answer" json:"answer"`
 }
 
 type DBAnswers struct {

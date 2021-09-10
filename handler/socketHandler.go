@@ -18,7 +18,7 @@ func hostSocketHandler(ws *websocket.Conn) {
 		return
 	}
 
-	id, err := socket.Init(ws, socket.Host, db)
+	id, err := socket.Init(ws, socket.Host, db, "")
 	if err != nil {
 		logrus.Infof("socket error: %v", err)
 		ws.Close()
@@ -39,13 +39,6 @@ func visitorSocketHandler(ws *websocket.Conn) {
 		return
 	}
 
-	id, err := socket.Init(ws, socket.Visitor, db)
-	if err != nil {
-		logrus.Infof("socket error: %v", err)
-		ws.Close()
-		return
-	}
-
 	uuidObj, err := uuid.NewUUID()
 	if err != nil {
 		logrus.Infof("uuid error: %v", err)
@@ -53,6 +46,14 @@ func visitorSocketHandler(ws *websocket.Conn) {
 		return
 	}
 	userId := util.NewDateSeed().AddSeed(uuidObj.String()).CreateSpecifyLength(5)
+
+	id, err := socket.Init(ws, socket.Visitor, db, userId)
+	if err != nil {
+		logrus.Infof("socket error: %v", err)
+		ws.Close()
+		return
+	}
+
 	defer socket.Close(ws, db, socket.Visitor, userId)
 
 	socket.SendVisitor(ws, db, id)
