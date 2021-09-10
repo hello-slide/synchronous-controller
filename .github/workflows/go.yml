@@ -13,7 +13,7 @@ jobs:
     
     services:
       postgres:
-        image: postgres
+        image: postgres:latest
         env:
           POSTGRES_HOST: user
           POSTGRES_PORT: 5432
