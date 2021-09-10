@@ -24,13 +24,12 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-          
-    steps:
-    - name: Setup db
-      env:
-        LOCAL_TEST: db
-        DB_USER: user
 
+    env:
+      LOCAL_TEST: db
+      DB_USER: user
+    
+    steps:
     - uses: actions/checkout@v2
     - name: Set up Go
       uses: actions/setup-go@v2
