@@ -10,7 +10,7 @@ import (
 
 // websocket handler of host.
 func hostSocketHandler(ws *websocket.Conn) {
-	logrus.Debugf("Create host socket.")
+	logrus.Info("Create host socket.")
 
 	id, err := socket.Init(ws, socket.Host, db, "")
 	if err != nil {
@@ -20,13 +20,13 @@ func hostSocketHandler(ws *websocket.Conn) {
 	}
 	defer socket.Close(ws, db, socket.Host, id)
 
-	socket.SendHost(ws, db, id)
 	go socket.ReceiveHost(ws, db, id)
+	socket.SendHost(ws, db, id)
 }
 
 // websocket handler of visitor.
 func visitorSocketHandler(ws *websocket.Conn) {
-	logrus.Debugf("Create visitor socket.")
+	logrus.Info("Create visitor socket.")
 
 	uuidObj, err := uuid.NewUUID()
 	if err != nil {
@@ -45,6 +45,6 @@ func visitorSocketHandler(ws *websocket.Conn) {
 
 	defer socket.Close(ws, db, socket.Visitor, userId)
 
-	socket.SendVisitor(ws, db, id)
 	go socket.ReceiveVisitor(ws, db, id, userId)
+	socket.SendVisitor(ws, db, id)
 }
