@@ -6,6 +6,10 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+func Roothandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("hello"))
+}
+
 // handler of host.
 func HostHandler(w http.ResponseWriter, r *http.Request) {
 	s := websocket.Server{

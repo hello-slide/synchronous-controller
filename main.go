@@ -10,6 +10,7 @@ import (
 
 func main() {
 	mux := http.NewServeMux()
+	mux.HandleFunc("/", handler.Roothandler)
 	mux.HandleFunc("/sync/host", handler.HostHandler)
 	mux.HandleFunc("/sync/visitor", handler.VisitorHandler)
 
