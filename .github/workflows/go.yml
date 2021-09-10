@@ -7,13 +7,34 @@ on:
     branches: [ main ]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    
+    env:
+      ENV: runner-job
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_USER: user
+          POSTGRES_DB: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+          
     steps:
-    - uses: actions/checkout@v2
+    - name: Setup db
+      run: createdb hello-slide-test
+      env:
+        LOCAL_TEST: db
+        DB_USER: user
 
+    - uses: actions/checkout@v2
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
