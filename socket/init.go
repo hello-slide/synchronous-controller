@@ -56,10 +56,10 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp, userId str
 		// Databas operation
 		answers := database.NewDBAnswers(AnswersTableName, db)
 		if err := answers.CreateTable(); err != nil {
-			return "", nil
+			return "", err
 		}
 		if err := connectUser.CreateTable(); err != nil {
-			return "", nil
+			return "", err
 		}
 
 		topicOp := database.NewDBTopic(TopicTableName, db)
@@ -72,7 +72,7 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp, userId str
 			IsUpdate: false,
 		}
 		if err := topicOp.CreateTopic(topic); err != nil {
-			return "", nil
+			return "", err
 		}
 
 		initializeSendMessage := map[string]string{
