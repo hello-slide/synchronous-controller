@@ -7,13 +7,32 @@ on:
     branches: [ main ]
 
 jobs:
-
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_HOST: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: hello-slide-test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    env:
+      LOCAL_TEST: db
+      DB_USER: postgres
+      DB_PW: postgres
+    
     steps:
     - uses: actions/checkout@v2
-
     - name: Set up Go
       uses: actions/setup-go@v2
       with:
