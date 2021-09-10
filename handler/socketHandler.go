@@ -16,13 +16,13 @@ func hostSocketHandler(ws *websocket.Conn) {
 
 	id, err := socket.Init(ws, socket.Host, db)
 	if err != nil {
-		socket.Close(ws, db, id, err)
+		logrus.Infof("socket error: %v", err)
 		return
 	}
+	defer socket.Close(ws, db, id, nil)
 
 	socket.SendHost(ws, id)
 
-	defer socket.Close(ws, db, id, nil)
 }
 
 func visitorSocketHandler(ws *websocket.Conn) {
