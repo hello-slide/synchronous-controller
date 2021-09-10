@@ -68,7 +68,7 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp, userId str
 		}
 		topic := &database.Topic{
 			Id:       id,
-			Topic:    "",
+			Topic:    "null",
 			IsUpdate: false,
 		}
 		if err := topicOp.CreateTopic(topic); err != nil {
