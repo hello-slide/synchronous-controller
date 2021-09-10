@@ -7,6 +7,10 @@ COPY go.mod ./
 RUN go mod download
 
 COPY ./main.go ./
+COPY ./database ./database/
+COPY ./handler ./handler/
+COPY ./socket ./socket/
+COPY ./util ./util/
 
 ARG CGO_ENABLED=0
 ARG GOOS=linux
