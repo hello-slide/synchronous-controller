@@ -29,6 +29,7 @@ jobs:
     env:
       LOCAL_TEST: db
       DB_USER: user
+      DB_PW: postgres
     
     steps:
     - uses: actions/checkout@v2
