@@ -82,6 +82,8 @@ func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string) {
 //	id {string} - id
 func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string) {
 	topic := database.NewDBTopic(TopicTableName, db)
+	answers := database.NewDBAnswers(AnswersTableName, db)
+
 	isUpdate, err := topic.GetIsUpdate(id)
 	if err != nil {
 		logrus.Errorf("receivedHost isUpdate error: %v", err)
@@ -90,7 +92,9 @@ func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string) {
 
 	for {
 		var receivedData map[string]string
-		websocket.JSON.Receive(ws, receivedData)
+		if err := websocket.JSON.Receive(ws, receivedData); err != nil {
+			logrus.Errorf("error: %v", err)
+		}
 
 		statusType, ok1 := receivedData["type"]
 		newTopic, ok2 := receivedData["topic"]
@@ -103,6 +107,14 @@ func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string) {
 			}
 			if err := topic.UpdateTopic(topicData); err != nil {
 				logrus.Errorf("receivedHost updateTopic error: %v", err)
+				return
+			}
+
+			// Sleep for a period of time as they may not be deleted if answered after updating the topic.
+			time.Sleep(2 * time.Second)
+
+			if err := answers.Delete(id); err != nil {
+				logrus.Errorf("receivedHost deleteAnswers error: %v", err)
 				return
 			}
 			isUpdate = !isUpdate
