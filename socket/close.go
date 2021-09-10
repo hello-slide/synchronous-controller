@@ -43,6 +43,4 @@ func Close(ws *websocket.Conn, db *database.DatabaseOp, status Status, id string
 			return
 		}
 	}
-
-	db.Close()
 }
