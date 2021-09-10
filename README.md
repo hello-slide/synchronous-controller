@@ -38,10 +38,14 @@ dropdb hello-slide-test
 ## Websocket types
 
 0. セッション開始リクエスト（Host）
+   - サーバーから同じ値で返答あり
 1. セッション開始リクエスト（visitor）
+   - サーバーから同じ値で返答あり
 2. 参加者数取得
 3. 回答取得
 4. 新しいトピック割当
+5. トピック送信（visitor）
+6. 回答（visitor）
 
 ## LICENSE
 
