@@ -19,6 +19,9 @@ func TestConnectUser(t *testing.T) {
 	dbName := "hello-slide-test"
 	tableName := "connectusers"
 
+	t.Logf("DB user: %v", user)
+	t.Logf("DB password: %v", password)
+
 	rootId := "rootIdsample"
 
 	sampleUserIdOne := "samplesample1"
