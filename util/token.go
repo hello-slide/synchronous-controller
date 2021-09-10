@@ -2,6 +2,7 @@ package util
 
 import (
 	"crypto/sha256"
+	"encoding/hex"
 	"strings"
 	"time"
 )
@@ -42,12 +43,11 @@ func (t *Token) hash() [32]byte {
 // Create token.
 func (t *Token) Create() string {
 	hash := t.hash()
-	return string(hash[:])
+	return hex.EncodeToString(hash[:])
 }
 
 // Create token.
 // specify length
 func (t *Token) CreateSpecifyLength(length int) string {
-	hash := t.hash()
-	return string(hash[:])[0:length]
+	return t.Create()[0:length]
 }
