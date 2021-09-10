@@ -40,7 +40,7 @@ func NewLocalConfig(user string, dbName string, password string) *Config {
 	if len(password) == 0 {
 		config = fmt.Sprintf("user=%s dbname=%s sslmode=disable", user, dbName)
 	} else {
-		config = fmt.Sprintf("user=%s dbname=%s password=%s sslmode=disable", user, dbName, password)
+		config = fmt.Sprintf("host=127.0.0.1 port=5432 user=%s dbname=%s password=%s sslmode=disable", user, dbName, password)
 	}
 
 	return &Config{
