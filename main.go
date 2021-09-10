@@ -8,6 +8,12 @@ import (
 	"github.com/hello-slide/synchronous-controller/handler"
 )
 
+func init() {
+	if err := handler.Init(); err != nil {
+		panic("database init error")
+	}
+}
+
 func main() {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/", handler.Roothandler)

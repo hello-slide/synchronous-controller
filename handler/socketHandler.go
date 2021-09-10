@@ -2,7 +2,6 @@ package handler
 
 import (
 	"github.com/google/uuid"
-	"github.com/hello-slide/synchronous-controller/database"
 	"github.com/hello-slide/synchronous-controller/socket"
 	"github.com/hello-slide/synchronous-controller/util"
 	"github.com/sirupsen/logrus"
@@ -11,14 +10,7 @@ import (
 
 // websocket handler of host.
 func hostSocketHandler(ws *websocket.Conn) {
-	db, err := database.NewDatabase(dbConfig)
-	if err != nil {
-		logrus.Infof("connect db error: %v", err)
-		ws.Close()
-		return
-	}
-
-	logrus.Debugf("Create host socket and connected database.")
+	logrus.Debugf("Create host socket.")
 
 	id, err := socket.Init(ws, socket.Host, db, "")
 	if err != nil {
@@ -34,14 +26,7 @@ func hostSocketHandler(ws *websocket.Conn) {
 
 // websocket handler of visitor.
 func visitorSocketHandler(ws *websocket.Conn) {
-	db, err := database.NewDatabase(dbConfig)
-	if err != nil {
-		logrus.Infof("connect db error: %v", err)
-		ws.Close()
-		return
-	}
-
-	logrus.Debugf("Create visitor socket and connected database.")
+	logrus.Debugf("Create visitor socket.")
 
 	uuidObj, err := uuid.NewUUID()
 	if err != nil {
