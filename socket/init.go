@@ -33,12 +33,12 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, e
 		return "", err
 	}
 
-	responseStatus, ok := responseMessage["status"]
+	responseType, ok := responseMessage["type"]
 	if !ok {
-		return "", errors.New("you need to specify the status")
+		return "", errors.New("you need to specify the type")
 	}
 
-	if responseStatus == "0" && status == Host {
+	if responseType == "0" && status == Host {
 		// host
 		uuidObj, err := uuid.NewUUID()
 		if err != nil {
@@ -48,6 +48,15 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, e
 		id := token.CreateSpecifyLength(5)
 
 		// Databas operation
+		answers := database.NewDBAnswers(AnswersTableName, db)
+		if err := answers.CreateTable(); err != nil {
+			return "", nil
+		}
+		connectUser := database.NewDBConnectUsers(ConnectUsersTablename, db)
+		if err := connectUser.CreateTable(); err != nil {
+			return "", nil
+		}
+
 		topicOp := database.NewDBTopic(TopicTableName, db)
 		if err := topicOp.CreateTable(); err != nil {
 			return "", err
@@ -62,7 +71,7 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, e
 		}
 
 		initializeSendMessage := map[string]string{
-			"status":  "0",
+			"type":    "0",
 			"version": "1.0",
 			"id":      id,
 		}
@@ -73,10 +82,10 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, e
 
 		return id, nil
 	}
-	if responseStatus == "1" && status == Visitor {
+	if responseType == "1" && status == Visitor {
 		// visitor
 		initializeSendMessage := map[string]string{
-			"status":  "1",
+			"type":    "1",
 			"version": "1.0",
 		}
 
@@ -86,5 +95,5 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, e
 
 		return "", nil
 	}
-	return "", errors.New("the initial status must be 0 or 1")
+	return "", errors.New("the initial type must be 0 or 1")
 }

@@ -35,6 +35,14 @@ dropdb hello-slide-test
 ./tools/stop_local_db.sh
 ```
 
+## Websocket types
+
+0. セッション開始リクエスト（Host）
+1. セッション開始リクエスト（visitor）
+2. 参加者数取得
+3. 回答取得
+4. 新しいトピック割当
+
 ## LICENSE
 
 [MIT](./LICENSE)
