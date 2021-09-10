@@ -11,14 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     
-    env:
-      ENV: runner-job
     services:
       postgres:
         image: postgres
         env:
-          POSTGRES_USER: user
-          POSTGRES_DB: postgres
+          POSTGRES_HOST: user
+          POSTGRES_PORT: 5432
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
