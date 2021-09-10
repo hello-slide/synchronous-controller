@@ -5,11 +5,8 @@
 ## Env
 
 ```env
-KEY= # Google IAM json
-PUBSUB_PROJECT_ID=
-
 DB_USER=
-DB_NAME=
+DATABASE_NAME=
 DB_PASSWORD=
 ```
 
