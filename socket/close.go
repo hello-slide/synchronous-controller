@@ -6,8 +6,16 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-func Close(ws *websocket.Conn, db *database.DatabaseOp, id string, err error) {
-	logrus.Infof("websocket connection failed err: %v", err)
+// Close operation.
+//
+// close the all database connection and websocket.
+//
+// Arguments:
+//	ws {*websocket.Conn} - websocket op.
+//	db {*database.DatabaseOp} - database operator.
+//	id {string} - session id.
+func Close(ws *websocket.Conn, db *database.DatabaseOp, id string) {
+	defer ws.Close()
 
 	topic := database.NewDBTopic(TopicTableName, db)
 	if err := topic.Delete(id); err != nil {
@@ -28,5 +36,4 @@ func Close(ws *websocket.Conn, db *database.DatabaseOp, id string, err error) {
 	}
 
 	db.Close()
-	ws.Close()
 }

@@ -6,6 +6,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// handler of host.
 func HostHandler(w http.ResponseWriter, r *http.Request) {
 	s := websocket.Server{
 		Handler: websocket.Handler(hostSocketHandler),
@@ -13,6 +14,7 @@ func HostHandler(w http.ResponseWriter, r *http.Request) {
 	s.ServeHTTP(w, r)
 }
 
+// handler of visitor.
 func VisitorHandler(w http.ResponseWriter, r *http.Request) {
 	s := websocket.Server{
 		Handler: websocket.Handler(visitorSocketHandler),

@@ -1,14 +1,13 @@
 package handler
 
 import (
-	"time"
-
 	"github.com/hello-slide/synchronous-controller/database"
 	"github.com/hello-slide/synchronous-controller/socket"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
 )
 
+// websocket handler of host.
 func hostSocketHandler(ws *websocket.Conn) {
 	db, err := database.NewDatabase(dbConfig)
 	if err != nil {
@@ -23,17 +22,13 @@ func hostSocketHandler(ws *websocket.Conn) {
 		ws.Close()
 		return
 	}
-	defer socket.Close(ws, db, id, nil)
+	defer socket.Close(ws, db, id)
 
-	quit := make(chan bool)
-
-	socket.SendHost(ws, quit, db, id)
-	go socket.ReceiveHost(ws, quit, db, id)
-
-	time.Sleep(2 * time.Second)
-	quit <- true
+	socket.SendHost(ws, db, id)
+	go socket.ReceiveHost(ws, db, id)
 }
 
+// websocket handler of visitor.
 func visitorSocketHandler(ws *websocket.Conn) {
 	defer ws.Close()
 }
