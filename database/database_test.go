@@ -15,7 +15,7 @@ func TestConnectUser(t *testing.T) {
 	// ----config------
 
 	user := os.Getenv("DB_USER")
-	password := ""
+	password := os.Getenv("DB_PW")
 	dbName := "hello-slide-test"
 	tableName := "connectusers"
 
@@ -77,7 +77,7 @@ func TestAnswers(t *testing.T) {
 	// ----config------
 
 	user := os.Getenv("DB_USER")
-	password := ""
+	password := os.Getenv("DB_PW")
 	dbName := "hello-slide-test"
 	tableName := "answers"
 
@@ -138,7 +138,7 @@ func TestTopic(t *testing.T) {
 	// ----config------
 
 	user := os.Getenv("DB_USER")
-	password := ""
+	password := os.Getenv("DB_PW")
 	dbName := "hello-slide-test"
 	tableName := "topic"
 
