@@ -1,6 +1,6 @@
 #! /bin/bash
 
-if [ $# != 1 || $# != 2 ]; then
+if [ $# != 1 ] && [ $# != 2 ]; then
     echo "example: sh ./test.sh [db username] ([password])"
     exit 1
 fi
@@ -8,7 +8,7 @@ fi
 export LOCAL_TEST="db"
 export DB_USER=$1
 
-if [ $2 ]; then
+if [ -z "$2" ]; then
     export DB_PW=$2
 fi
 

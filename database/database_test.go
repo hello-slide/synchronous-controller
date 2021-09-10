@@ -1,26 +1,45 @@
 package database_test
 
 import (
+	"log"
 	"os"
 	"testing"
 
 	"github.com/hello-slide/synchronous-controller/database"
 )
 
-func TestConnectUser(t *testing.T) {
+var db *database.DatabaseOp
+
+func init() {
 	if os.Getenv("LOCAL_TEST") != "db" {
+		log.Printf("Database test was not run.")
 		return
 	}
-
-	// ----config------
 
 	user := os.Getenv("DB_USER")
 	password := os.Getenv("DB_PW")
 	dbName := "hello-slide-test"
-	tableName := "connectusers"
 
-	t.Logf("DB user: %v", user)
-	t.Logf("DB password: %v", password)
+	log.Printf("username: %v", user)
+	log.Printf("password: %v", password)
+
+	config := database.NewLocalConfig(user, dbName, password)
+	_db, err := database.NewDatabase(config)
+	if err != nil {
+		log.Fatalf("db connect error: %v", err)
+	}
+	db = _db
+}
+
+func TestConnectUser(t *testing.T) {
+	if os.Getenv("LOCAL_TEST") != "db" || db == nil {
+		t.Log("not run test")
+		return
+	}
+	t.Log("run test")
+
+	// ----config------
+	tableName := "connectusers"
 
 	rootId := "rootIdsample"
 
@@ -38,12 +57,6 @@ func TestConnectUser(t *testing.T) {
 	}
 
 	// -----end------
-
-	config := database.NewLocalConfig(user, dbName, password)
-	db, err := database.NewDatabase(config)
-	if err != nil {
-		t.Fatalf("db connect error: %v", err)
-	}
 
 	connectUser := database.NewDBConnectUsers(tableName, db)
 
@@ -74,15 +87,13 @@ func TestConnectUser(t *testing.T) {
 }
 
 func TestAnswers(t *testing.T) {
-	if os.Getenv("LOCAL_TEST") != "db" {
+	if os.Getenv("LOCAL_TEST") != "db" || db == nil {
+		t.Log("not run test")
 		return
 	}
+	t.Log("run test")
 
 	// ----config------
-
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PW")
-	dbName := "hello-slide-test"
 	tableName := "answers"
 
 	rootId := "rootIdsample"
@@ -100,12 +111,6 @@ func TestAnswers(t *testing.T) {
 	}
 
 	// -----end------
-
-	config := database.NewLocalConfig(user, dbName, password)
-	db, err := database.NewDatabase(config)
-	if err != nil {
-		t.Fatalf("db connect error: %v", err)
-	}
 
 	dbAnswer := database.NewDBAnswers(tableName, db)
 
@@ -136,15 +141,13 @@ func TestAnswers(t *testing.T) {
 }
 
 func TestTopic(t *testing.T) {
-	if os.Getenv("LOCAL_TEST") != "db" {
+	if os.Getenv("LOCAL_TEST") != "db" || db == nil {
+		t.Log("not run test")
 		return
 	}
+	t.Log("run test")
 
 	// ----config------
-
-	user := os.Getenv("DB_USER")
-	password := os.Getenv("DB_PW")
-	dbName := "hello-slide-test"
 	tableName := "topic"
 
 	rootId := "topic_id"
@@ -162,12 +165,6 @@ func TestTopic(t *testing.T) {
 	}
 
 	// -----end------
-
-	config := database.NewLocalConfig(user, dbName, password)
-	db, err := database.NewDatabase(config)
-	if err != nil {
-		t.Fatalf("db connect error: %v", err)
-	}
 
 	dbTopic := database.NewDBTopic(tableName, db)
 
