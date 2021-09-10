@@ -15,7 +15,7 @@ jobs:
       postgres:
         image: postgres
         env:
-          POSTGRES_HOST: user
+          POSTGRES_HOST: postgres
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: hello-slide-test
         options: >-
@@ -28,7 +28,7 @@ jobs:
 
     env:
       LOCAL_TEST: db
-      DB_USER: user
+      DB_USER: postgres
       DB_PW: postgres
     
     steps:
