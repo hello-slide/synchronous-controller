@@ -5,6 +5,7 @@ import "fmt"
 type Answer struct {
 	Id     string `db:"id"`
 	UserId string `db:"user_id"`
+	Name   string `db:"name"`
 	Answer string `db:"answer"`
 }
 
@@ -21,7 +22,7 @@ type DBAnswers struct {
 // Returns:
 //	{*DBConnectUsers} - user connect db instance.
 func NewDBAnswers(tableName string, db *DatabaseOp) *DBAnswers {
-	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL, answer VARCHAR(1024))"
+	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL, name VARCHAR(256), answer VARCHAR(1024))"
 
 	return &DBAnswers{
 		AbstractDBController{
@@ -37,9 +38,9 @@ func NewDBAnswers(tableName string, db *DatabaseOp) *DBAnswers {
 // Arguments:
 // data {*Answer} - Answer data.
 func (c *DBAnswers) AddAnswer(data *Answer) error {
-	sql := fmt.Sprintf("INSERT INTO %s (id , user_id, answer) VALUES ($1, $2, $3)", c.TableName)
+	sql := fmt.Sprintf("INSERT INTO %s (id , user_id, name, answer) VALUES ($1, $2, $3, $4)", c.TableName)
 
-	_, err := c.DB.Execute(sql, data.Id, data.UserId, data.Answer)
+	_, err := c.DB.Execute(sql, data.Id, data.Name, data.UserId, data.Answer)
 	if err != nil {
 		return err
 	}
@@ -64,7 +65,7 @@ func (c *DBAnswers) GetAnswers(targetId string) ([]Answer, error) {
 	var data Answer
 
 	for result.Next() {
-		if err := result.Scan(&data.Id, &data.UserId, &data.Answer); err != nil {
+		if err := result.Scan(&data.Id, &data.UserId, &data.Name, &data.Answer); err != nil {
 			return nil, err
 		}
 		answers = append(answers, data)
