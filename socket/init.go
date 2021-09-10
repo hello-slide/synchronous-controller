@@ -26,7 +26,7 @@ const (
 //	db {*database.DatabaseOp} - database op instance.
 //
 // Returns:
-//	{string} - unique id. Empty if status is visitor.
+//	{string} - unique id.
 func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, error) {
 	var responseMessage map[string]string
 	if err := websocket.JSON.Receive(ws, &responseMessage); err != nil {
@@ -83,6 +83,11 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, e
 		return id, nil
 	}
 	if responseType == "1" && status == Visitor {
+		id, ok := responseMessage["id"]
+		if !ok {
+			return "", errors.New("id is not found")
+		}
+
 		// visitor
 		initializeSendMessage := map[string]string{
 			"type":    "1",
@@ -90,7 +95,7 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp) (string, e
 		}
 
 		if err := websocket.JSON.Send(ws, initializeSendMessage); err != nil {
-			return "", err
+			return id, err
 		}
 
 		return "", nil
