@@ -40,11 +40,12 @@ func TestConnectUser(t *testing.T) {
 	// -----end------
 
 	config := database.NewLocalConfig(user, dbName, password)
-
-	connectUser, err := database.NewDBConnectUsers(tableName, config)
+	db, err := database.NewDatabase(config)
 	if err != nil {
 		t.Fatalf("db connect error: %v", err)
 	}
+
+	connectUser := database.NewDBConnectUsers(tableName, db)
 
 	if err := connectUser.CreateTable(); err != nil {
 		t.Fatalf("create table error: %v", err)
@@ -101,11 +102,12 @@ func TestAnswers(t *testing.T) {
 	// -----end------
 
 	config := database.NewLocalConfig(user, dbName, password)
-
-	dbAnswer, err := database.NewDBAnswers(tableName, config)
+	db, err := database.NewDatabase(config)
 	if err != nil {
 		t.Fatalf("db connect error: %v", err)
 	}
+
+	dbAnswer := database.NewDBAnswers(tableName, db)
 
 	if err := dbAnswer.CreateTable(); err != nil {
 		t.Fatalf("create table error: %v", err)
@@ -162,11 +164,12 @@ func TestTopic(t *testing.T) {
 	// -----end------
 
 	config := database.NewLocalConfig(user, dbName, password)
-
-	dbTopic, err := database.NewDBTopic(tableName, config)
+	db, err := database.NewDatabase(config)
 	if err != nil {
 		t.Fatalf("db connect error: %v", err)
 	}
+
+	dbTopic := database.NewDBTopic(tableName, db)
 
 	if err := dbTopic.CreateTable(); err != nil {
 		t.Fatalf("create table error: %v", err)

@@ -17,15 +17,11 @@ type ConnectUser struct {
 //
 // Arguments:
 //	tableName {string} - table name.
-//	config {Config} - db config.
+//	db {*DatabaseOp} - database instance.
 //
 // Returns:
 //	{*DBConnectUsers} - user connect db instance.
-func NewDBConnectUsers(tableName string, config *Config) (*DBConnectUsers, error) {
-	db, err := NewDatabase(config)
-	if err != nil {
-		return nil, err
-	}
+func NewDBConnectUsers(tableName string, db *DatabaseOp) *DBConnectUsers {
 	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL)"
 
 	return &DBConnectUsers{
@@ -34,7 +30,7 @@ func NewDBConnectUsers(tableName string, config *Config) (*DBConnectUsers, error
 			TableName: tableName,
 			Columns:   columns,
 		},
-	}, nil
+	}
 }
 
 // Add the participating users.

@@ -16,15 +16,11 @@ type Topic struct {
 //
 // Arguments:
 //	tableName {string} - table name.
-//	config {Config} - db config.
+//	db {*DatabaseOp} - database instance.
 //
 // Returns:
 //	{*DBConnectUsers} - topic db instance.
-func NewDBTopic(tableName string, config *Config) (*DBTopic, error) {
-	db, err := NewDatabase(config)
-	if err != nil {
-		return nil, err
-	}
+func NewDBTopic(tableName string, db *DatabaseOp) *DBTopic {
 	columns := "(id VARCHAR(256) NOT NULL,is_update boolean, topic VARCHAR(1024))"
 
 	return &DBTopic{
@@ -33,7 +29,7 @@ func NewDBTopic(tableName string, config *Config) (*DBTopic, error) {
 			TableName: tableName,
 			Columns:   columns,
 		},
-	}, nil
+	}
 }
 
 // Create topics.

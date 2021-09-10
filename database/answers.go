@@ -16,15 +16,11 @@ type DBAnswers struct {
 //
 // Arguments:
 //	tableName {string} - table name.
-//	config {Config} - db config.
+//	db {*DatabaseOp} - database instance.
 //
 // Returns:
 //	{*DBConnectUsers} - user connect db instance.
-func NewDBAnswers(tableName string, config *Config) (*DBAnswers, error) {
-	db, err := NewDatabase(config)
-	if err != nil {
-		return nil, err
-	}
+func NewDBAnswers(tableName string, db *DatabaseOp) *DBAnswers {
 	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL, answer VARCHAR(1024))"
 
 	return &DBAnswers{
@@ -33,7 +29,7 @@ func NewDBAnswers(tableName string, config *Config) (*DBAnswers, error) {
 			TableName: tableName,
 			Columns:   columns,
 		},
-	}, nil
+	}
 }
 
 // Insert the new answer.
