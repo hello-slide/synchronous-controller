@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hello-slide/synchronous-controller/database"
 	"github.com/hello-slide/synchronous-controller/util"
+	"github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
 )
 
@@ -33,6 +34,8 @@ func Init(ws *websocket.Conn, status Status, db *database.DatabaseOp, userId str
 	if err := websocket.JSON.Receive(ws, &responseMessage); err != nil {
 		return "", err
 	}
+
+	logrus.Debugf("Init response data: %v", responseMessage)
 
 	responseType, ok := responseMessage["type"]
 	if !ok {

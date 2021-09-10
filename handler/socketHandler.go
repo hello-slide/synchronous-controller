@@ -18,6 +18,8 @@ func hostSocketHandler(ws *websocket.Conn) {
 		return
 	}
 
+	logrus.Debugf("Create host socket and connected database.")
+
 	id, err := socket.Init(ws, socket.Host, db, "")
 	if err != nil {
 		logrus.Infof("socket error: %v", err)
@@ -38,6 +40,8 @@ func visitorSocketHandler(ws *websocket.Conn) {
 		ws.Close()
 		return
 	}
+
+	logrus.Debugf("Create visitor socket and connected database.")
 
 	uuidObj, err := uuid.NewUUID()
 	if err != nil {

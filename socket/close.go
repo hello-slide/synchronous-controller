@@ -16,6 +16,7 @@ import (
 //	id {string} - session id or user id.
 func Close(ws *websocket.Conn, db *database.DatabaseOp, status Status, id string) {
 	defer ws.Close()
+	logrus.Debugf("close websocket clients.")
 
 	if status == Host {
 		topic := database.NewDBTopic(TopicTableName, db)
