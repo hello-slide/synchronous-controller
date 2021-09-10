@@ -13,10 +13,10 @@ jobs:
     
     services:
       postgres:
-        image: postgres:11@sha256:85d79cba2d4942dad7c99f84ec389a5b9cc84fb07a3dcd3aff0fb06948cdc03b
+        image: postgres:12
         env:
           POSTGRES_HOST: user
-          POSTGRES_PORT: 5432
+          POSTGRES_DB: hello-slide-test
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -27,7 +27,6 @@ jobs:
           
     steps:
     - name: Setup db
-      run: createdb hello-slide-test
       env:
         LOCAL_TEST: db
         DB_USER: user
