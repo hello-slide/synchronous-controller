@@ -92,7 +92,7 @@ func choice(answers *[]database.Answer, buffer *[]string) ([]database.Answer) {
 
 	// reset answers buffer
 	if len(*answers) == 0 {
-		buffer = &[]string{}
+		*buffer = []string{}
 		return *answers
 	}
 
