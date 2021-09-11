@@ -63,7 +63,7 @@ func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan 
 			}
 
 			if len(_answers) != len(answersBuffer) {
-				sendAns := choice(_answers, answersBuffer)
+				sendAns := choice(&_answers, &answersBuffer)
 
 				sendData := &SendAnswers{
 					SendType: "3",
@@ -87,18 +87,18 @@ func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan 
 //
 // Returns:
 //	{[]database.Answer} - send ansers.
-func choice(answers []database.Answer, buffer []string) ([]database.Answer) {
+func choice(answers *[]database.Answer, buffer *[]string) ([]database.Answer) {
 	sendAns := []database.Answer{}
 
 	// reset answers buffer
-	if len(answers) == 0 {
-		buffer = []string{}
-		return answers
+	if len(*answers) == 0 {
+		buffer = &[]string{}
+		return *answers
 	}
 
-	for _, ans := range answers {
+	for _, ans := range *answers {
 		isExist := false
-		for _, buf := range buffer {
+		for _, buf := range *buffer {
 			if buf == ans.UserId {
 				isExist = true
 				break
@@ -106,7 +106,7 @@ func choice(answers []database.Answer, buffer []string) ([]database.Answer) {
 		}
 
 		if !isExist {
-			buffer = append(buffer, ans.UserId)
+			*buffer = append(*buffer, ans.UserId)
 			sendAns = append(sendAns, ans)
 		}
 	}
