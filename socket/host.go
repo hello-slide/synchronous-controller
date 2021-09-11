@@ -105,7 +105,7 @@ func choice(answers []database.Answer, buffer []string) ([]database.Answer) {
 			}
 		}
 
-		if isExist {
+		if !isExist {
 			buffer = append(buffer, ans.UserId)
 			sendAns = append(sendAns, ans)
 		}
