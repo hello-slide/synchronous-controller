@@ -58,6 +58,7 @@ dropdb hello-slide-test
    # req
    {
        "type": "1",
+       "id": ""
    }
 
    # res
