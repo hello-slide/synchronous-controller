@@ -1,6 +1,7 @@
 package socket
 
 import (
+	"io"
 	"strconv"
 	"time"
 
@@ -20,7 +21,7 @@ type SendAnswers struct {
 //	ws {*websocket.Conn} - websocket operator.
 //	db {*database.DatabaseOp} - database op.
 //	id {string} - id
-func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string) {
+func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan bool) {
 	connectUser := database.NewDBConnectUsers(ConnectUsersTablename, db)
 	answers := database.NewDBAnswers(AnswersTableName, db)
 
@@ -28,49 +29,52 @@ func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string) {
 	var answersBuffer []database.Answer = []database.Answer{}
 
 	for {
-		// participant
-		nums, err := connectUser.GetUserNumber(id)
-		if err != nil {
-			logrus.Errorf("sendHost getusernumber error: %v", err)
+		select {
+		case <- quit:
 			return
-		}
-		if nums != usersBuffer {
-			sendData := map[string]string{
-				"type":     "2",
-				"visitors": strconv.Itoa(nums),
+		default:
+			// participant
+			nums, err := connectUser.GetUserNumber(id)
+			if err != nil {
+				logrus.Errorf("sendHost getusernumber error: %v", err)
+				return
 			}
-			if err := websocket.JSON.Send(ws, sendData); err != nil {
-				logrus.Errorf("sendHost send visitors error: %v", err)
+			if nums != usersBuffer {
+				sendData := map[string]string{
+					"type":     "2",
+					"visitors": strconv.Itoa(nums),
+				}
+				if err := websocket.JSON.Send(ws, sendData); err != nil {
+					logrus.Errorf("sendHost send visitors error: %v", err)
+					return
+				}
+
+				usersBuffer = nums
+			}
+
+			time.Sleep(1 * time.Second)
+
+			// answers
+			_answers, err := answers.GetAnswers(id)
+			if err != nil {
+				logrus.Errorf("sendHost getanswers error: %v", err)
 				return
 			}
 
-			usersBuffer = nums
-		}
+			if len(_answers) != len(answersBuffer) {
+				sendData := &SendAnswers{
+					SendType: "3",
+					Answers:  _answers,
+				}
+				if err := websocket.JSON.Send(ws, sendData); err != nil {
+					logrus.Errorf("sendHost send answers error: %v", err)
+					return
+				}
 
-		time.Sleep(1 * time.Second)
-
-		// answers
-		_answers, err := answers.GetAnswers(id)
-		if err != nil {
-			logrus.Errorf("sendHost getanswers error: %v", err)
-			return
-		}
-
-		if len(_answers) != len(answersBuffer) {
-			sendData := &SendAnswers{
-				SendType: "3",
-				Answers:  _answers,
+				answersBuffer = _answers
 			}
-			if err := websocket.JSON.Send(ws, sendData); err != nil {
-				logrus.Errorf("sendHost send answers error: %v", err)
-				return
-			}
-
-			answersBuffer = _answers
+			time.Sleep(1 * time.Second)
 		}
-
-		time.Sleep(1 * time.Second)
-
 	}
 }
 
@@ -80,7 +84,7 @@ func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string) {
 //	ws {*websocket.Conn} - websocket operator.
 //	db {*database.DatabaseOp} - database op.
 //	id {string} - id
-func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string) {
+func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan bool) {
 	topic := database.NewDBTopic(TopicTableName, db)
 	answers := database.NewDBAnswers(AnswersTableName, db)
 
@@ -93,7 +97,13 @@ func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string) {
 	for {
 		var receivedData map[string]string
 		if err := websocket.JSON.Receive(ws, receivedData); err != nil {
-			logrus.Errorf("error: %v", err)
+			if err == io.EOF {
+				quit <- true
+				logrus.Infof("close socket id: %v", id)
+			}else{
+				logrus.Errorf("websocket recrived error: %v", err)
+			}
+			return
 		}
 
 		statusType, ok1 := receivedData["type"]
@@ -119,8 +129,6 @@ func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string) {
 			}
 			isUpdate = !isUpdate
 		}
-
-		time.Sleep(1 * time.Second)
 	}
 
 }

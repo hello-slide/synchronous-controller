@@ -1,50 +1,45 @@
 package handler
 
 import (
-	"github.com/google/uuid"
+	"io"
+
 	"github.com/hello-slide/synchronous-controller/socket"
-	"github.com/hello-slide/synchronous-controller/util"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
 )
 
 // websocket handler of host.
 func hostSocketHandler(ws *websocket.Conn) {
-	logrus.Info("Create host socket.")
-
-	id, err := socket.Init(ws, socket.Host, db, "")
+	id, err := socket.NewInitSocket(ws, db).Host()
 	if err != nil {
-		logrus.Infof("socket error: %v", err)
+		if err != io.EOF {
+			logrus.Errorf("host init socket err: %v", err)
+		}
 		ws.Close()
 		return
 	}
-	defer socket.Close(ws, db, socket.Host, id)
+	defer socket.NewCloseSocket(ws, db, id).HostNoErr()
 
-	go socket.ReceiveHost(ws, db, id)
-	socket.SendHost(ws, db, id)
+	quit := make(chan bool)
+
+	go socket.SendHost(ws, db, id, quit)
+	socket.ReceiveHost(ws, db, id, quit)
 }
 
 // websocket handler of visitor.
 func visitorSocketHandler(ws *websocket.Conn) {
-	logrus.Info("Create visitor socket.")
-
-	uuidObj, err := uuid.NewUUID()
+	id, userId, err := socket.NewInitSocket(ws, db).Visitor()
 	if err != nil {
-		logrus.Infof("uuid error: %v", err)
+		if err != io.EOF {
+			logrus.Errorf("visitor init socket err: %v", err)
+		}
 		ws.Close()
 		return
 	}
-	userId := util.NewDateSeed().AddSeed(uuidObj.String()).CreateSpecifyLength(5)
+	defer socket.NewCloseSocket(ws, db, id).VisitorNoErr()
 
-	id, err := socket.Init(ws, socket.Visitor, db, userId)
-	if err != nil {
-		logrus.Infof("socket error: %v", err)
-		ws.Close()
-		return
-	}
+	quit := make(chan bool)
 
-	defer socket.Close(ws, db, socket.Visitor, userId)
-
-	go socket.ReceiveVisitor(ws, db, id, userId)
-	socket.SendVisitor(ws, db, id)
+	go socket.SendVisitor(ws, db, id, quit)
+	socket.ReceiveVisitor(ws, db, id, userId, quit)
 }
