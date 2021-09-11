@@ -41,6 +41,5 @@ func visitorSocketHandler(ws *websocket.Conn) {
 	quit := make(chan bool)
 
 	go socket.SendVisitor(ws, db, id, quit)
-	go socket.ReceiveVisitor(ws, db, id, userId, quit)
-	socket.CheckTopic(ws, db, id, quit)
+	socket.ReceiveVisitor(ws, db, id, userId, quit)
 }

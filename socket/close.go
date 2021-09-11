@@ -46,6 +46,8 @@ func (c *CloseSocket) VisitorNoErr(userId string) {
 func (c *CloseSocket) Host() error {
 	defer c.ws.Close()
 
+	logrus.Infof("close socket id: %v", c.id)
+
 	topic := database.NewDBTopic(TopicTableName, c.db)
 	if err := topic.Delete(c.id); err != nil {
 		return err
@@ -68,6 +70,8 @@ func (c *CloseSocket) Host() error {
 //	- delete  connect users for user id.
 func (c *CloseSocket) Visitor(userId string) error {
 	defer c.ws.Close()
+
+	logrus.Infof("close socket visitor id: %v, userid: %v", c.id, userId)
 
 	connectUser := database.NewDBConnectUsers(ConnectUsersTablename, c.db)
 	if err := connectUser.DeleteUser(userId); err != nil {

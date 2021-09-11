@@ -99,7 +99,6 @@ func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit ch
 		if err := websocket.JSON.Receive(ws, receivedData); err != nil {
 			if err == io.EOF {
 				quit <- true
-				logrus.Infof("close socket id: %v", id)
 			}else{
 				logrus.Errorf("websocket recrived error: %v", err)
 			}

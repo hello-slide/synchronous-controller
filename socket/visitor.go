@@ -27,6 +27,16 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, quit ch
 		case <- quit:
 			return
 		default:
+			exist, err := topic.Exist(id)
+			if err != nil {
+				logrus.Errorf("sendVisitor exist error: %v", err)
+				return
+			}
+			if !exist {
+				ws.Close()
+				return
+			}
+
 			newIsUpdate, err := topic.GetIsUpdate(id)
 			if err != nil {
 				logrus.Errorf("sendVisitor isUpdate error: %v", err)
@@ -65,54 +75,32 @@ func sendTopic(ws *websocket.Conn, topic *database.DBTopic, id string) error {
 func ReceiveVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId string, quit chan bool) {
 	answers := database.NewDBAnswers(AnswersTableName, db)
 	for {
-		select {
-		case <- quit:
+		var receivedData map[string]string
+		if err := websocket.JSON.Receive(ws, receivedData); err != nil {
+			if err == io.EOF {
+				quit <- true
+				logrus.Infof("close socket id: %v", id)
+			}else{
+				logrus.Errorf("websocket recrived error: %v", err)
+			}
 			return
-		default:
-			var receivedData map[string]string
-			if err := websocket.JSON.Receive(ws, receivedData); err != nil {
-				if err == io.EOF {
-					quit <- true
-					logrus.Infof("close socket id: %v", id)
-				}else{
-					logrus.Errorf("websocket recrived error: %v", err)
-				}
+		}
+
+		statusType, ok := receivedData["type"]
+
+		if ok && statusType == "6" {
+			data := &database.Answer{
+				Id:     id,
+				UserId: userId,
+				Name:   receivedData["name"],
+				Answer: receivedData["answer"],
+			}
+
+			if err := answers.AddAnswer(data); err != nil {
+				logrus.Errorf("error: %v", err)
 				return
 			}
-
-			statusType, ok := receivedData["type"]
-
-			if ok && statusType == "6" {
-				data := &database.Answer{
-					Id:     id,
-					UserId: userId,
-					Name:   receivedData["name"],
-					Answer: receivedData["answer"],
-				}
-
-				if err := answers.AddAnswer(data); err != nil {
-					logrus.Errorf("error: %v", err)
-					return
-				}
-			}
 		}
-	}
-}
 
-
-func CheckTopic(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan bool) {
-	topic := database.NewDBTopic(TopicTableName, db)
-
-	for {
-		exist, err := topic.Exist(id)
-		if err != nil {
-			logrus.Errorf("sendVisitor exist error: %v", err)
-			return
-		}
-		if !exist {
-			quit <- true
-			logrus.Infof("close socket visitor id: %v", id)
-			return
-		}
 	}
 }
