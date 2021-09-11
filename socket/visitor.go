@@ -96,7 +96,7 @@ func ReceiveVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, user
 	answers := database.NewDBAnswers(AnswersTableName, db)
 	for {
 		var receivedData map[string]string
-		if err := websocket.JSON.Receive(ws, receivedData); err != nil {
+		if err := websocket.JSON.Receive(ws, &receivedData); err != nil {
 			if err == io.EOF {
 				quit <- true
 				logrus.Infof("close socket id: %v", id)

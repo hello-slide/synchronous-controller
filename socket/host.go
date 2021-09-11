@@ -98,7 +98,7 @@ func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit ch
 
 	for {
 		var receivedData map[string]string
-		if err := websocket.JSON.Receive(ws, receivedData); err != nil {
+		if err := websocket.JSON.Receive(ws, &receivedData); err != nil {
 			if err == io.EOF {
 				quit <- true
 			}else{
