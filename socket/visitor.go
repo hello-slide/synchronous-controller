@@ -33,7 +33,7 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, quit ch
 				return
 			}
 			if !exist {
-				ws.Close()
+				quit <- true
 				return
 			}
 
