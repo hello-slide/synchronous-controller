@@ -120,10 +120,18 @@ func (c *InitializeSocket) Visitor() (string, string, error) {
 	}
 
 	connectUser := database.NewDBConnectUsers(ConnectUsersTablename, c.db)
+	topic := database.NewDBTopic(TopicTableName, c.db)
 
 	id, ok := responseMessage["id"]
 	if !ok {
 		return "", "", errors.New("id is not found")
+	}
+	isExist, err := topic.Exist(id)
+	if err != nil {
+		return "", "", err
+	}
+	if !isExist {
+		return "", "", errors.New("id is not exists")
 	}
 
 	userId, err := c.createId(id)
