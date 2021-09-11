@@ -12,6 +12,12 @@ type CloseSocket struct {
 	id string
 }
 
+// Create close socket instance.
+//
+// Arguments:
+//	ws {*websocket.Conn} - websocket
+//	db {*database.DatabaseOp} - database operator
+//	id {string} - id.
 func NewCloseSocket(ws *websocket.Conn, db *database.DatabaseOp, id string) *CloseSocket {
 	return &CloseSocket{
 		ws: ws,
@@ -32,6 +38,11 @@ func (c *CloseSocket) VisitorNoErr() {
 	}
 }
 
+// Close host.
+//
+//	- delete topic for id.
+//	- delete answers for id.
+//	- delete connect users for id.
 func (c *CloseSocket) Host() error {
 	defer c.ws.Close()
 
@@ -52,6 +63,9 @@ func (c *CloseSocket) Host() error {
 	return nil
 }
 
+// Close visitor.
+//
+//	- delete  connect users for user id.
 func (c *CloseSocket) Visitor() error {
 	defer c.ws.Close()
 

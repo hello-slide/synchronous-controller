@@ -23,6 +23,11 @@ type InitializeSocket struct {
 	db *database.DatabaseOp
 }
 
+// Create initialize socket instance.
+//
+// Arguments:
+//	ws {*websocket.Conn} - websocket
+//	db {*database.DatabaseOp} - database operator
 func NewInitSocket(ws *websocket.Conn, db *database.DatabaseOp) *InitializeSocket {
 	return &InitializeSocket{
 		ws: ws,
@@ -30,6 +35,10 @@ func NewInitSocket(ws *websocket.Conn, db *database.DatabaseOp) *InitializeSocke
 	}
 }
 
+// initialize host.
+//
+// Returns:
+//	{string} - id
 func (c *InitializeSocket) Host() (string, error) {
 	var responseMessage map[string]string
 	if err := websocket.JSON.Receive(c.ws, &responseMessage); err != nil {
@@ -89,6 +98,11 @@ func (c *InitializeSocket) Host() (string, error) {
 	return id, nil
 }
 
+// initialize visitor
+//
+// Returns:
+//	{string} - id.
+//	{string} - user id.
 func (c *InitializeSocket) Visitor() (string, string, error) {
 	var responseMessage map[string]string
 	if err := websocket.JSON.Receive(c.ws, &responseMessage); err != nil {
@@ -137,6 +151,13 @@ func (c *InitializeSocket) Visitor() (string, string, error) {
 	return id, userId, nil
 }
 
+// Create id.
+//
+// Arguments:
+//	prefix {string} - id prefix.
+//
+// Returns:
+//	{string} - id.
 func (c *InitializeSocket) createId(prefix string) (string, error) {
 	uuidObj, err := uuid.NewUUID()
 	if err != nil {

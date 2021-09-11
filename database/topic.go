@@ -86,6 +86,19 @@ func (c *DBTopic) GetIsUpdate(id string) (bool, error) {
 	return c.DB.GetBool(sql, id)
 }
 
+// Exist id
+//
+// Arguments:
+//	id {string} - topic id.
+//
+// Returns:
+//	{bool} - true if exist.
+func (c *DBTopic) Exist(id string) (bool, error) {
+	sql := fmt.Sprintf("SELECT EXISTS(SELECT * FROM %s WHERE id = $1)", c.TableName)
+
+	return c.DB.GetBool(sql, id)
+}
+
 // Delete topic information.
 //
 // Arguments:
