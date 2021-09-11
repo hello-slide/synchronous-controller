@@ -27,7 +27,7 @@ func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan 
 	answers := database.NewDBAnswers(AnswersTableName, db)
 
 	var usersBuffer int = 0
-	var answersBuffer []database.Answer = []database.Answer{}
+	var answersBuffer []string = []string{}
 
 	for {
 		select {
@@ -63,20 +63,55 @@ func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan 
 			}
 
 			if len(_answers) != len(answersBuffer) {
+				sendAns := choice(_answers, answersBuffer)
+
 				sendData := &SendAnswers{
 					SendType: "3",
-					Answers:  _answers,
+					Answers:  sendAns,
 				}
 				if err := websocket.JSON.Send(ws, sendData); err != nil {
 					logrus.Errorf("sendHost send answers error: %v", err)
 					return
 				}
-
-				answersBuffer = _answers
 			}
 			time.Sleep(1 * time.Second)
 		}
 	}
+}
+
+// select answers.
+//
+// Arguments:
+//	answers {[]database.Answer} - answers.
+//	buffer {[]string} - buffer list
+//
+// Returns:
+//	{[]database.Answer} - send ansers.
+func choice(answers []database.Answer, buffer []string) ([]database.Answer) {
+	sendAns := []database.Answer{}
+
+	// reset answers buffer
+	if len(answers) == 0 {
+		buffer = []string{}
+		return answers
+	}
+
+	for _, ans := range answers {
+		isExist := false
+		for _, buf := range buffer {
+			if buf == ans.UserId {
+				isExist = true
+				break
+			}
+		}
+
+		if isExist {
+			buffer = append(buffer, ans.UserId)
+			sendAns = append(sendAns, ans)
+		}
+	}
+
+	return sendAns
 }
 
 // Received a socket to the host.
