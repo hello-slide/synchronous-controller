@@ -21,7 +21,7 @@ type Topic struct {
 // Returns:
 //	{*DBConnectUsers} - topic db instance.
 func NewDBTopic(tableName string, db *DatabaseOp) *DBTopic {
-	columns := "(id VARCHAR(256) NOT NULL,is_update boolean, topic VARCHAR(1024))"
+	columns := "(id VARCHAR(256) NOT NULL, is_update boolean, topic VARCHAR(1024), PRIMARY KEY (id))"
 
 	return &DBTopic{
 		AbstractDBController{

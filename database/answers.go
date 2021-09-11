@@ -22,7 +22,7 @@ type DBAnswers struct {
 // Returns:
 //	{*DBConnectUsers} - user connect db instance.
 func NewDBAnswers(tableName string, db *DatabaseOp) *DBAnswers {
-	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL, name VARCHAR(256), answer VARCHAR(1024))"
+	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL, name VARCHAR(256), answer VARCHAR(1024), PRIMARY KEY (user_id))"
 
 	return &DBAnswers{
 		AbstractDBController{
