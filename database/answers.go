@@ -40,7 +40,7 @@ func NewDBAnswers(tableName string, db *DatabaseOp) *DBAnswers {
 func (c *DBAnswers) AddAnswer(data *Answer) error {
 	sql := fmt.Sprintf("INSERT INTO %s (id , user_id, name, answer) VALUES ($1, $2, $3, $4)", c.TableName)
 
-	_, err := c.DB.Execute(sql, data.Id, data.Name, data.UserId, data.Answer)
+	_, err := c.DB.Execute(sql, data.Id, data.UserId, data.Name, data.Answer)
 	if err != nil {
 		return err
 	}
