@@ -27,16 +27,6 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, quit ch
 		case <- quit:
 			return
 		default:
-			exist, err := topic.Exist(id)
-			if err != nil {
-				logrus.Errorf("sendVisitor exist error: %v", err)
-				return
-			}
-			if !exist {
-				quit <- true
-				return
-			}
-
 			newIsUpdate, err := topic.GetIsUpdate(id)
 			if err != nil {
 				logrus.Errorf("sendVisitor isUpdate error: %v", err)
@@ -105,6 +95,24 @@ func ReceiveVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, user
 					return
 				}
 			}
+		}
+	}
+}
+
+
+func CheckTopic(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan bool) {
+	topic := database.NewDBTopic(TopicTableName, db)
+
+	for {
+		exist, err := topic.Exist(id)
+		if err != nil {
+			logrus.Errorf("sendVisitor exist error: %v", err)
+			return
+		}
+		if !exist {
+			quit <- true
+			logrus.Infof("close socket visitor id: %v", id)
+			return
 		}
 	}
 }
