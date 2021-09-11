@@ -169,5 +169,5 @@ func (c *InitializeSocket) createId(prefix string) (string, error) {
 		return id, nil
 	}
 
-	return strings.Join([]string{id, prefix}, ""), nil
+	return strings.Join([]string{prefix, id}, ""), nil
 }

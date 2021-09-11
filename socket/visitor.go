@@ -9,6 +9,13 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+// Send a socket to the visitor.
+//
+// Arguments:
+//	ws {*websocket.Conn} - websocket operator.
+//	db {*database.DatabaseOp} - database op.
+//	id {string} - id
+//	quit {chan bool} - quit signal.
 func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan bool) {
 	topic := database.NewDBTopic(TopicTableName, db)
 
@@ -56,6 +63,12 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, quit ch
 	}
 }
 
+// send topics.
+//
+// Arguments:
+//	ws {*websocket.Conn} - websocket operator.
+//	db {*database.DatabaseOp} - database op.
+//	id {string} - id
 func sendTopic(ws *websocket.Conn, topic *database.DBTopic, id string) error {
 	topicData, err := topic.GetTopic(id)
 	if err != nil {
@@ -72,6 +85,13 @@ func sendTopic(ws *websocket.Conn, topic *database.DBTopic, id string) error {
 	return nil
 }
 
+// Received a socket to the visitor.
+//
+// Arguments:
+//	ws {*websocket.Conn} - websocket operator.
+//	db {*database.DatabaseOp} - database op.
+//	id {string} - id
+//	quit {chan bool} - quit signal.
 func ReceiveVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId string, quit chan bool) {
 	answers := database.NewDBAnswers(AnswersTableName, db)
 	for {

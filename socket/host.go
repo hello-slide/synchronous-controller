@@ -21,6 +21,7 @@ type SendAnswers struct {
 //	ws {*websocket.Conn} - websocket operator.
 //	db {*database.DatabaseOp} - database op.
 //	id {string} - id
+//	quit {chan bool} - quit signal.
 func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan bool) {
 	connectUser := database.NewDBConnectUsers(ConnectUsersTablename, db)
 	answers := database.NewDBAnswers(AnswersTableName, db)
@@ -84,6 +85,7 @@ func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan 
 //	ws {*websocket.Conn} - websocket operator.
 //	db {*database.DatabaseOp} - database op.
 //	id {string} - id
+//	quit {chan bool} - quit signal.
 func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan bool) {
 	topic := database.NewDBTopic(TopicTableName, db)
 	answers := database.NewDBAnswers(AnswersTableName, db)
