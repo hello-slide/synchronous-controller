@@ -52,7 +52,7 @@ func VisitorSend(db *database.DatabaseOp, queue *map[string]map[string]*websocke
 
 // Close websocket.
 func endWebsocket(sockets *map[string]*websocket.Conn, id string) {
-	logrus.Info("close visitors id: %v", id)
+	logrus.Infof("close visitors id: %v", id)
 
 	for _, ws := range *sockets {
 		ws.Close()
