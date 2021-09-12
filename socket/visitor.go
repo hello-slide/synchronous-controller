@@ -47,6 +47,29 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId 
 	}
 }
 
+// send topics.
+//
+// Arguments:
+//	ws {*websocket.Conn} - websocket operator.
+//	db {*database.DatabaseOp} - database op.
+//	id {string} - id
+func sendTopic(ws *websocket.Conn, topic *database.DBTopic, id string) error {
+	topicData, err := topic.GetTopic(id)
+	if err != nil {
+		return err
+	}
+	sendData := map[string]string{
+		"type":  "5",
+		"topic": topicData,
+	}
+	if err := websocket.JSON.Send(ws, sendData); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+
 // Received a socket to the visitor.
 //
 // Arguments:

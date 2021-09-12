@@ -21,11 +21,11 @@ func VisitorSend(db *database.DatabaseOp, queue *map[string]map[string]*websocke
 
 			exist, err := topic.Exist(id)
 			if err != nil {
-				endWebsocket(&element)
+				endWebsocket(&element, id)
 				return
 			}
 			if !exist {
-				endWebsocket(&element)
+				endWebsocket(&element, id)
 				return
 			}
 
@@ -50,40 +50,32 @@ func VisitorSend(db *database.DatabaseOp, queue *map[string]map[string]*websocke
 	}
 }
 
+// Close websocket.
+func endWebsocket(sockets *map[string]*websocket.Conn, id string) {
+	logrus.Info("close visitors id: %v", id)
 
-func endWebsocket(sockets *map[string]*websocket.Conn) {
 	for _, ws := range *sockets {
 		ws.Close()
 	}
 }
 
-func sendTopics(topics *map[string]*websocket.Conn, topic *database.DBTopic, id string) {
-	for _, ws := range *topics {
-		if err := sendTopic(ws, topic, id); err != nil {
-			logrus.Errorf("send topic error: %v", err)
-			return
-		}
-	}
-}
-
-// send topics.
-//
-// Arguments:
-//	ws {*websocket.Conn} - websocket operator.
-//	db {*database.DatabaseOp} - database op.
-//	id {string} - id
-func sendTopic(ws *websocket.Conn, topic *database.DBTopic, id string) error {
+// send topic to ids.
+func sendTopics(conns *map[string]*websocket.Conn, topic *database.DBTopic, id string) {
 	topicData, err := topic.GetTopic(id)
 	if err != nil {
-		return err
+		logrus.Errorf("get topic err: %v", err)
+		return
 	}
 	sendData := map[string]string{
 		"type":  "5",
 		"topic": topicData,
 	}
-	if err := websocket.JSON.Send(ws, sendData); err != nil {
-		return err
-	}
 
-	return nil
+	logrus.Infof("update topic: %v", topicData)
+
+	for _, ws := range *conns {
+		if err := websocket.JSON.Send(ws, sendData); err != nil {
+			logrus.Errorf("websocket send err: %v", err)
+		}
+	}
 }
