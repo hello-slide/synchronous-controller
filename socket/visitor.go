@@ -40,6 +40,7 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId 
 					bufferTopic = *topic
 				}
 			}else {
+				ws.Close()
 				return
 			}
 
