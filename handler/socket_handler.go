@@ -20,6 +20,10 @@ func hostSocketHandler(ws *websocket.Conn) {
 		ws.Close()
 		return
 	}
+	if _, ok := queue[id]; !ok {
+		*queue[id] = make(map[string]*websocket.Conn)
+	}
+
 	defer socket.NewCloseSocket(ws, db, id, &queue).HostNoErr()
 
 	quit := make(chan bool)
@@ -38,6 +42,7 @@ func visitorSocketHandler(ws *websocket.Conn) {
 		ws.Close()
 		return
 	}
+
 	defer socket.NewCloseSocket(ws, db, id, &queue).VisitorNoErr(userId)
 
 	quit := make(chan bool)
