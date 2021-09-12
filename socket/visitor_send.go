@@ -36,15 +36,12 @@ func VisitorSend(db *database.DatabaseOp, queue *map[string]map[string]*websocke
 			}
 
 			if isUpdate, ok := updates[id]; ok {
-				logrus.Infof("update check: %v, new: %v, old: %v", newIsUpdate != isUpdate, newIsUpdate, isUpdate)
-
 				if newIsUpdate != isUpdate {
 					sendTopics(&element, topic, id)
 
 					updates[id] = newIsUpdate
 				}
 			}else {
-				logrus.Infof("update isUpdate id: %v", id)
 				updates[id] = newIsUpdate
 			}
 		}

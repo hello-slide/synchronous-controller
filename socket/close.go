@@ -32,8 +32,8 @@ func (c *CloseSocket) HostNoErr() {
 	}
 }
 
-func (c *CloseSocket) VisitorNoErr(userId string) {
-	if err := c.Visitor(userId); err != nil {
+func (c *CloseSocket) VisitorNoErr(userId string, queue *map[string]map[string]*websocket.Conn) {
+	if err := c.Visitor(userId, queue); err != nil {
 		logrus.Infof("ERR socket close: %v", err)
 	}
 }
@@ -68,7 +68,9 @@ func (c *CloseSocket) Host() error {
 // Close visitor.
 //
 //	- delete  connect users for user id.
-func (c *CloseSocket) Visitor(userId string) error {
+func (c *CloseSocket) Visitor(userId string, queue *map[string]map[string]*websocket.Conn) error {
+	delete((*queue)[c.id], userId)
+
 	defer c.ws.Close()
 
 	logrus.Infof("close socket visitor id: %v, userid: %v", c.id, userId)

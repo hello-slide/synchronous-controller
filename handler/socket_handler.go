@@ -38,8 +38,7 @@ func visitorSocketHandler(ws *websocket.Conn) {
 		ws.Close()
 		return
 	}
-	defer socket.NewCloseSocket(ws, db, id).VisitorNoErr(userId)
-	defer clearQueue(id, userId)
+	defer socket.NewCloseSocket(ws, db, id).VisitorNoErr(userId, &queue)
 
 	quit := make(chan bool)
 
@@ -50,8 +49,4 @@ func visitorSocketHandler(ws *websocket.Conn) {
 
 func VisitorSendHandler() {
 	socket.VisitorSend(db, &queue)
-}
-
-func clearQueue(id string, userId string) {
-	delete(queue[id], userId)
 }
