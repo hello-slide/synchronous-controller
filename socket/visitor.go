@@ -21,6 +21,7 @@ import (
 func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId string, quit chan bool, topics *map[string]*string) {
 
 	var bufferTopic string
+	var isFirst = true
 
 	if _, ok := (*topics)[id]; !ok {
 		(*topics)[id] = new(string)
@@ -32,12 +33,13 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId 
 			return
 		default:
 			if topic, ok := (*topics)[id]; ok {
-				if bufferTopic != *topic {
+				if bufferTopic != *topic || isFirst {
 					if err := sendTopic(ws, *topic, id); err != nil {
 						logrus.Errorf("websocket send err: %v", err)
 						return
 					}
 					bufferTopic = *topic
+					isFirst = false
 				}
 			}else {
 				ws.Close()
