@@ -31,13 +31,16 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId 
 		case <- quit:
 			return
 		default:
-			topic := *(*topics)[id]
-			if bufferTopic != topic {
-				if err := sendTopic(ws, topic, id); err != nil {
-					logrus.Errorf("websocket send err: %v", err)
-					return
+			if topic, ok := (*topics)[id]; ok {
+				if bufferTopic != *topic {
+					if err := sendTopic(ws, *topic, id); err != nil {
+						logrus.Errorf("websocket send err: %v", err)
+						return
+					}
+					bufferTopic = *topic
 				}
-				bufferTopic = topic
+			}else {
+				return
 			}
 
 			time.Sleep(1 * time.Second)
