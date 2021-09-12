@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-var queue = make(map[string]map[string]*websocket.Conn)
+var queue = make(map[string]*map[string]*websocket.Conn)
 
 // websocket handler of host.
 func hostSocketHandler(ws *websocket.Conn) {

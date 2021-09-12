@@ -8,7 +8,7 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-func VisitorSend(db *database.DatabaseOp, queue *map[string]map[string]*websocket.Conn) {
+func VisitorSend(db *database.DatabaseOp, queue *map[string]*map[string]*websocket.Conn) {
 	topic := database.NewDBTopic(TopicTableName, db)
 
 	var updates = make(map[string]bool)
@@ -21,11 +21,11 @@ func VisitorSend(db *database.DatabaseOp, queue *map[string]map[string]*websocke
 
 			exist, err := topic.Exist(id)
 			if err != nil {
-				endWebsocket(&element, id)
+				endWebsocket(element, id)
 				return
 			}
 			if !exist {
-				endWebsocket(&element, id)
+				endWebsocket(element, id)
 				return
 			}
 
@@ -37,7 +37,7 @@ func VisitorSend(db *database.DatabaseOp, queue *map[string]map[string]*websocke
 
 			if isUpdate, ok := updates[id]; ok {
 				if newIsUpdate != isUpdate {
-					sendTopics(&element, topic, id)
+					sendTopics(element, topic, id)
 
 					updates[id] = newIsUpdate
 				}
