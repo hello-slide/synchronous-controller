@@ -20,7 +20,7 @@ func main() {
 	mux.HandleFunc("/sync/host", handler.HostHandler)
 	mux.HandleFunc("/sync/visitor", handler.VisitorHandler)
 
-	go handler.VisitorSendHandler()
+	go handler.BackgroundTopicGetter()
 
 	networkHandler := networkutil.CorsConfig.Handler(mux)
 

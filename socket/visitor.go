@@ -2,6 +2,7 @@ package socket
 
 import (
 	"io"
+	"time"
 
 	"github.com/hello-slide/synchronous-controller/database"
 	"github.com/sirupsen/logrus"
@@ -16,30 +17,31 @@ import (
 //	id {string} - id
 //	userId {string} - user id
 //	quit {chan bool} - quit signal.
-//	queue {map[string]map[string]*websocket.Conn} - send visitor queue.
-func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId string, quit chan bool, queue map[string]map[string]*websocket.Conn) {
-	select {
-	case <- quit:
-		return
-	default:
-		topic := database.NewDBTopic(TopicTableName, db)
+//	topics {*map[string]*string} - topics.
+func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId string, quit chan bool, topics *map[string]*string) {
 
-		exist, err := topic.Exist(id)
-		if err != nil {
-			ws.Close()
-			return
-		}
-		if !exist {
-			ws.Close()
-			return
-		}
+	var bufferTopic string
 
-		if err := sendTopic(ws, topic, id); err != nil {
-			logrus.Errorf("error: %v", err)
-			return
-		}
+	if _, ok := (*topics)[id]; !ok {
+		(*topics)[id] = new(string)
+	}
 
-		queue[id][userId] = ws
+	for{
+		select {
+		case <- quit:
+			return
+		default:
+			topic := *(*topics)[id]
+			if bufferTopic != topic {
+				if err := sendTopic(ws, topic, id); err != nil {
+					logrus.Errorf("websocket send err: %v", err)
+					return
+				}
+				bufferTopic = topic
+			}
+
+			time.Sleep(1 * time.Second)
+		}
 	}
 }
 
@@ -47,16 +49,12 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId 
 //
 // Arguments:
 //	ws {*websocket.Conn} - websocket operator.
-//	db {*database.DatabaseOp} - database op.
+//	topic {string} - topic value.
 //	id {string} - id
-func sendTopic(ws *websocket.Conn, topic *database.DBTopic, id string) error {
-	topicData, err := topic.GetTopic(id)
-	if err != nil {
-		return err
-	}
+func sendTopic(ws *websocket.Conn, topic string, id string) error {
 	sendData := map[string]string{
 		"type":  "5",
-		"topic": topicData,
+		"topic": topic,
 	}
 	if err := websocket.JSON.Send(ws, sendData); err != nil {
 		return err
