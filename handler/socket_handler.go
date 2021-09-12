@@ -8,6 +8,8 @@ import (
 	"golang.org/x/net/websocket"
 )
 
+var queue = make(map[string]map[string]*websocket.Conn)
+
 // websocket handler of host.
 func hostSocketHandler(ws *websocket.Conn) {
 	id, err := socket.NewInitSocket(ws, db).Host()
@@ -37,9 +39,19 @@ func visitorSocketHandler(ws *websocket.Conn) {
 		return
 	}
 	defer socket.NewCloseSocket(ws, db, id).VisitorNoErr(userId)
+	defer clearQueue(id, userId)
 
 	quit := make(chan bool)
 
-	go socket.SendVisitor(ws, db, id, quit)
+	go socket.SendVisitor(ws, db, id, userId, quit, &queue)
 	socket.ReceiveVisitor(ws, db, id, userId, quit)
+}
+
+
+func VisitorSendHandler() {
+	socket.VisitorSend(db, &queue)
+}
+
+func clearQueue(id string, userId string) {
+	delete(queue[id], userId)
 }
