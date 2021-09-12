@@ -2,7 +2,6 @@ package socket
 
 import (
 	"io"
-	"time"
 
 	"github.com/hello-slide/synchronous-controller/database"
 	"github.com/sirupsen/logrus"
@@ -15,74 +14,37 @@ import (
 //	ws {*websocket.Conn} - websocket operator.
 //	db {*database.DatabaseOp} - database op.
 //	id {string} - id
+//	userId {string} - user id
 //	quit {chan bool} - quit signal.
-func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan bool) {
-	topic := database.NewDBTopic(TopicTableName, db)
-
-	if err := sendTopic(ws, topic, id); err != nil {
-		logrus.Errorf("error: %v", err)
+//	queue {*map[string]map[string]*websocket.Conn} - send visitor queue.
+func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId string, quit chan bool, queue *map[string]map[string]*websocket.Conn) {
+	select {
+	case <- quit:
 		return
-	}
-	isUpdate, err := topic.GetIsUpdate(id)
-	if err != nil {
-		logrus.Errorf("sendVisitor isUpdate error: %v", err)
-		return
-	}
+	default:
+		topic := database.NewDBTopic(TopicTableName, db)
 
-	for {
-		select {
-		case <- quit:
+		exist, err := topic.Exist(id)
+		if err != nil {
+			ws.Close()
 			return
-		default:
-			exist, err := topic.Exist(id)
-			if err != nil {
-				logrus.Errorf("sendVisitor exist error: %v", err)
-				return
-			}
-			if !exist {
-				ws.Close()
-				return
-			}
-
-			newIsUpdate, err := topic.GetIsUpdate(id)
-			if err != nil {
-				logrus.Errorf("sendVisitor isUpdate error: %v", err)
-				return
-			}
-
-			if newIsUpdate != isUpdate {
-				if err := sendTopic(ws, topic, id); err != nil {
-					logrus.Errorf("error: %v", err)
-					return
-				}
-
-				isUpdate = newIsUpdate
-			}
-			time.Sleep(1 * time.Second)
 		}
-	}
-}
+		if !exist {
+			ws.Close()
+			return
+		}
 
-// send topics.
-//
-// Arguments:
-//	ws {*websocket.Conn} - websocket operator.
-//	db {*database.DatabaseOp} - database op.
-//	id {string} - id
-func sendTopic(ws *websocket.Conn, topic *database.DBTopic, id string) error {
-	topicData, err := topic.GetTopic(id)
-	if err != nil {
-		return err
-	}
-	sendData := map[string]string{
-		"type":  "5",
-		"topic": topicData,
-	}
-	if err := websocket.JSON.Send(ws, sendData); err != nil {
-		return err
-	}
+		if err := sendTopic(ws, topic, id); err != nil {
+			logrus.Errorf("error: %v", err)
+			return
+		}
 
-	return nil
+		if _, ok := (*queue)[id]; ok {
+			(*queue)[id] = make(map[string]*websocket.Conn)
+		}
+
+		(*queue)[id][userId] = ws
+	}
 }
 
 // Received a socket to the visitor.

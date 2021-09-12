@@ -20,6 +20,8 @@ func main() {
 	mux.HandleFunc("/sync/host", handler.HostHandler)
 	mux.HandleFunc("/sync/visitor", handler.VisitorHandler)
 
+	go handler.VisitorSendHandler()
+
 	networkHandler := networkutil.CorsConfig.Handler(mux)
 
 	if err := http.ListenAndServe(":3000", networkHandler); err != nil {
