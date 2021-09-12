@@ -39,7 +39,7 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId 
 			return
 		}
 
-		if _, ok := (*queue)[id]; ok {
+		if _, ok := (*queue)[id]; !ok {
 			(*queue)[id] = make(map[string]*websocket.Conn)
 		}
 
