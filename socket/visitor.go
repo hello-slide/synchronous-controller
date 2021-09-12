@@ -16,8 +16,8 @@ import (
 //	id {string} - id
 //	userId {string} - user id
 //	quit {chan bool} - quit signal.
-//	queue {*map[string]map[string]*websocket.Conn} - send visitor queue.
-func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId string, quit chan bool, queue *map[string]*map[string]*websocket.Conn) {
+//	queue {map[string]map[string]*websocket.Conn} - send visitor queue.
+func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId string, quit chan bool, queue map[string]map[string]*websocket.Conn) {
 	select {
 	case <- quit:
 		return
@@ -39,7 +39,7 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId 
 			return
 		}
 
-		(*(*queue)[id])[userId] = ws
+		queue[id][userId] = ws
 	}
 }
 

@@ -8,13 +8,13 @@ import (
 	"golang.org/x/net/websocket"
 )
 
-func VisitorSend(db *database.DatabaseOp, queue *map[string]*map[string]*websocket.Conn) {
+func VisitorSend(db *database.DatabaseOp, queue map[string]map[string]*websocket.Conn) {
 	topic := database.NewDBTopic(TopicTableName, db)
 
 	var updates = make(map[string]bool)
 
 	for {
-		for id, element := range *queue {
+		for id, element := range queue {
 			if element == nil {
 				continue
 			}
@@ -51,16 +51,16 @@ func VisitorSend(db *database.DatabaseOp, queue *map[string]*map[string]*websock
 }
 
 // Close websocket.
-func endWebsocket(sockets *map[string]*websocket.Conn, id string) {
+func endWebsocket(sockets map[string]*websocket.Conn, id string) {
 	logrus.Infof("close visitors id: %v", id)
 
-	for _, ws := range *sockets {
+	for _, ws := range sockets {
 		ws.Close()
 	}
 }
 
 // send topic to ids.
-func sendTopics(conns *map[string]*websocket.Conn, topic *database.DBTopic, id string) {
+func sendTopics(conns map[string]*websocket.Conn, topic *database.DBTopic, id string) {
 	topicData, err := topic.GetTopic(id)
 	if err != nil {
 		logrus.Errorf("get topic err: %v", err)
@@ -73,7 +73,7 @@ func sendTopics(conns *map[string]*websocket.Conn, topic *database.DBTopic, id s
 
 	logrus.Infof("update topic: %v", topicData)
 
-	for _, ws := range *conns {
+	for _, ws := range conns {
 		if err := websocket.JSON.Send(ws, sendData); err != nil {
 			logrus.Errorf("websocket send err: %v", err)
 		}
