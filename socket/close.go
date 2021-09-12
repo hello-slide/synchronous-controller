@@ -10,6 +10,7 @@ type CloseSocket struct {
 	ws *websocket.Conn
 	db *database.DatabaseOp
 	id string
+	queue *map[string]map[string]*websocket.Conn
 }
 
 // Create close socket instance.
@@ -18,11 +19,12 @@ type CloseSocket struct {
 //	ws {*websocket.Conn} - websocket
 //	db {*database.DatabaseOp} - database operator
 //	id {string} - id.
-func NewCloseSocket(ws *websocket.Conn, db *database.DatabaseOp, id string) *CloseSocket {
+func NewCloseSocket(ws *websocket.Conn, db *database.DatabaseOp, id string, queue *map[string]map[string]*websocket.Conn) *CloseSocket {
 	return &CloseSocket{
 		ws: ws,
 		db: db,
 		id: id,
+		queue: queue,
 	}
 }
 
@@ -32,8 +34,8 @@ func (c *CloseSocket) HostNoErr() {
 	}
 }
 
-func (c *CloseSocket) VisitorNoErr(userId string, queue *map[string]map[string]*websocket.Conn) {
-	if err := c.Visitor(userId, queue); err != nil {
+func (c *CloseSocket) VisitorNoErr(userId string) {
+	if err := c.Visitor(userId); err != nil {
 		logrus.Infof("ERR socket close: %v", err)
 	}
 }
@@ -62,18 +64,21 @@ func (c *CloseSocket) Host() error {
 	if err := connectUsers.Delete(c.id); err != nil {
 		return err
 	}
+
+	delete(*c.queue, c.id)
+
 	return nil
 }
 
 // Close visitor.
 //
 //	- delete  connect users for user id.
-func (c *CloseSocket) Visitor(userId string, queue *map[string]map[string]*websocket.Conn) error {
-	delete((*queue)[c.id], userId)
+func (c *CloseSocket) Visitor(userId string) error {
+	logrus.Infof("close socket visitor id: %v, userid: %v", c.id, userId)
+
+	delete((*c.queue)[c.id], userId)
 
 	defer c.ws.Close()
-
-	logrus.Infof("close socket visitor id: %v, userid: %v", c.id, userId)
 
 	connectUser := database.NewDBConnectUsers(ConnectUsersTablename, c.db)
 	if err := connectUser.DeleteUser(userId); err != nil {

@@ -20,7 +20,7 @@ func hostSocketHandler(ws *websocket.Conn) {
 		ws.Close()
 		return
 	}
-	defer socket.NewCloseSocket(ws, db, id).HostNoErr()
+	defer socket.NewCloseSocket(ws, db, id, &queue).HostNoErr()
 
 	quit := make(chan bool)
 
@@ -38,7 +38,7 @@ func visitorSocketHandler(ws *websocket.Conn) {
 		ws.Close()
 		return
 	}
-	defer socket.NewCloseSocket(ws, db, id).VisitorNoErr(userId, &queue)
+	defer socket.NewCloseSocket(ws, db, id, &queue).VisitorNoErr(userId)
 
 	quit := make(chan bool)
 
