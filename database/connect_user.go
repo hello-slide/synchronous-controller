@@ -22,7 +22,7 @@ type ConnectUser struct {
 // Returns:
 //	{*DBConnectUsers} - user connect db instance.
 func NewDBConnectUsers(tableName string, db *DatabaseOp) *DBConnectUsers {
-	columns := "(id VARCHAR(256) NOT NULL, user_id VARCHAR(256) NOT NULL, PRIMARY KEY (user_id))"
+	columns := "(id VARCHAR(64) NOT NULL, user_id VARCHAR(64) NOT NULL, PRIMARY KEY (user_id))"
 
 	return &DBConnectUsers{
 		AbstractDBController{
