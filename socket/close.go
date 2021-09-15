@@ -1,6 +1,8 @@
 package socket
 
 import (
+	"time"
+
 	"github.com/hello-slide/synchronous-controller/database"
 	"github.com/sirupsen/logrus"
 	"golang.org/x/net/websocket"
@@ -44,8 +46,6 @@ func (c *CloseSocket) VisitorNoErr(userId string) {
 //	- delete answers for id.
 //	- delete connect users for id.
 func (c *CloseSocket) Host() error {
-	defer c.ws.Close()
-
 	logrus.Infof("close socket id: %v", c.id)
 
 	topic := database.NewDBTopic(TopicTableName, c.db)
@@ -53,13 +53,16 @@ func (c *CloseSocket) Host() error {
 		return err
 	}
 
-	answers := database.NewDBAnswers(AnswersTableName, c.db)
-	if err := answers.Delete(c.id); err != nil {
-		return err
-	}
+	c.ws.Close()
+	time.Sleep(1 * time.Second)
 
 	connectUsers := database.NewDBConnectUsers(ConnectUsersTablename, c.db)
 	if err := connectUsers.Delete(c.id); err != nil {
+		return err
+	}
+
+	answers := database.NewDBAnswers(AnswersTableName, c.db)
+	if err := answers.Delete(c.id); err != nil {
 		return err
 	}
 
