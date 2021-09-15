@@ -27,9 +27,9 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId 
 		(*topics)[id] = new(string)
 	}
 
-	for{
+	for {
 		select {
-		case <- quit:
+		case <-quit:
 			return
 		default:
 			if topic, ok := (*topics)[id]; ok {
@@ -41,7 +41,7 @@ func SendVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, userId 
 					bufferTopic = *topic
 					isFirst = false
 				}
-			}else {
+			} else {
 				ws.Close()
 				return
 			}
@@ -69,7 +69,6 @@ func sendTopic(ws *websocket.Conn, topic string, id string) error {
 	return nil
 }
 
-
 // Received a socket to the visitor.
 //
 // Arguments:
@@ -85,8 +84,8 @@ func ReceiveVisitor(ws *websocket.Conn, db *database.DatabaseOp, id string, user
 			if err == io.EOF {
 				quit <- true
 				logrus.Infof("close socket id: %v", id)
-			}else{
-				logrus.Errorf("websocket recrived error: %v", err)
+			} else {
+				logrus.Infof("websocket recrived close: %v", err)
 			}
 			return
 		}

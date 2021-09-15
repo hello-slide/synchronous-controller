@@ -31,7 +31,7 @@ func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan 
 
 	for {
 		select {
-		case <- quit:
+		case <-quit:
 			return
 		default:
 			// participant
@@ -87,7 +87,7 @@ func SendHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit chan 
 //
 // Returns:
 //	{[]database.Answer} - send ansers.
-func choice(answers *[]database.Answer, buffer *[]string) ([]database.Answer) {
+func choice(answers *[]database.Answer, buffer *[]string) []database.Answer {
 	sendAns := []database.Answer{}
 
 	// reset answers buffer
@@ -136,8 +136,8 @@ func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit ch
 		if err := websocket.JSON.Receive(ws, &receivedData); err != nil {
 			if err == io.EOF {
 				quit <- true
-			}else{
-				logrus.Errorf("websocket recrived error: %v", err)
+			} else {
+				logrus.Infof("websocket recrived close: %v", err)
 			}
 			return
 		}
@@ -157,7 +157,7 @@ func ReceiveHost(ws *websocket.Conn, db *database.DatabaseOp, id string, quit ch
 			}
 
 			// Sleep for a period of time as they may not be deleted if answered after updating the topic.
-			time.Sleep(2 * time.Second)
+			time.Sleep(1 * time.Second)
 
 			if err := answers.Delete(id); err != nil {
 				logrus.Errorf("receivedHost deleteAnswers error: %v", err)

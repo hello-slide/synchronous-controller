@@ -40,12 +40,12 @@ func TopicGetter(db *database.DatabaseOp, topics *map[string]*string) {
 
 					updates[id] = newIsUpdate
 				}
-			}else {
+			} else {
 				topicData, err := topic.GetTopic(id)
-					if err != nil {
-						logrus.Errorf("get topic err: %v", err)
-						continue
-					}
+				if err != nil {
+					logrus.Errorf("get topic err: %v", err)
+					continue
+				}
 				*value = topicData
 
 				updates[id] = newIsUpdate
